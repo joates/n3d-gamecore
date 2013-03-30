@@ -16,7 +16,8 @@
     global.window = global.document = global;
 
         //Import shared game library code.
-    require('./game.core.js');
+    require('./game.core.server.js');
+    require('./player.js');
 
         //A simple wrapper for logging so we can toggle it,
         //and augment it for clarity.
@@ -63,9 +64,6 @@
             //The first is always the type of message
         var message_type = message_parts[0];
 
-        var other_client =
-            (client.game.player_host.userid == client.userid) ?
-                client.game.player_client : client.game.player_host;
 
         if(message_type == 'i') {
                 //Input handler will forward this
@@ -73,8 +71,26 @@
         } else if(message_type == 'p') {
             client.send('s.p.' + message_parts[1]);
         } else if(message_type == 'c') {    //Client changed their color!
-            if(other_client)
-                other_client.send('s.c.' + message_parts[1]);
+
+            //send message to other clients that this guy has changed his color
+
+            //return if msg is invalid. i.e. no game id inside the message
+            //if (!this.games[ client.game.id ]) return; 
+            //console.log(client.game.id);
+            //console.log(message_parts[1]);
+
+            client.game.player_host.send('s.c.' + message_parts[1]);
+
+            for (var i=0;i<client.game.player_client.length;i++)
+            {
+                var p = client.game.player_client[i];
+                //if (!p.userid == client.userid) //send to everyone except himself
+                {
+                    //other_client=this.games[ client.game.id ].gamecore.allplayers[i];
+                    p.send('s.c.' + message_parts[1]);
+                }
+            }
+
         } else if(message_type == 'l') {    //A client is asking for lag simulation
             this.fake_latency = parseFloat(message_parts[1]);
         }
@@ -104,7 +120,7 @@
         var thegame = {
                 id : UUID(),                //generate a new id for the game
                 player_host:player,         //so we know who initiated the game
-                player_client:null,         //nobody else joined yet, since its new
+                player_client:new Array(),         //nobody else joined yet, since its new
                 player_count:1              //for simple checking of state
             };
 
@@ -136,27 +152,37 @@
     }; //game_server.createGame
 
         //we are requesting to kill a game in progress.
-    game_server.endGame = function(gameid, userid) {
+    game_server.playerDisconnect = function(gameid, userid) {
 
         var thegame = this.games[gameid];
 
         if(thegame) {
 
+            console.log("p count: "+thegame.player_count);
+            if (thegame.player_count > 1) {
+                thegame.player_count--;
+                thegame.gamecore.player_disconnect(userid);
+                return;
+            }
                 //stop the game updates immediate
             thegame.gamecore.stop_update();
 
                 //if the game has two players, the one is leaving
-            if(thegame.player_count > 1) {
+            if(thegame.player_count > 0) {
 
                     //send the players the message the game is ending
                 if(userid == thegame.player_host.userid) {
+                    console.log("HOST LEFT!!");
 
                         //the host left, oh snap. Lets try join another game
                     if(thegame.player_client) {
+
+                        for (var i = thegame.player_client.length - 1; i >= 0; i--) {
                             //tell them the game is over
-                        thegame.player_client.send('s.e');
+                            thegame.player_client[i].send('s.e');
                             //now look for/create a new game.
-                        this.findGame(thegame.player_client);
+                            this.findGame(thegame.player_client[i]);
+                        };
                     }
                     
                 } else {
@@ -168,6 +194,9 @@
                         thegame.player_host.hosting = false;
                             //now look for/create a new game.
                         this.findGame(thegame.player_host);
+
+                        //tell other clients too
+
                     }
                 }
             }
@@ -181,20 +210,25 @@
             this.log('that game was not found!');
         }
 
-    }; //game_server.endGame
+    }; //game_server.playerDisconnect
 
     game_server.startGame = function(game) {
 
-            //right so a game has 2 players and wants to begin
+            //right so a game has 2 or more players and wants to begin
             //the host already knows they are hosting,
             //tell the other client they are joining a game
             //s=server message, j=you are joining, send them the host id
-        game.player_client.send('s.j.' + game.player_host.userid);
-        game.player_client.game = game;
+            for (var i = game.player_client.length - 1; i >= 0; i--) {
+                game.player_client[i].send('s.j.' + game.player_host.userid);
+                game.player_client[i].game = game;
 
-            //now we tell both that the game is ready to start
-            //clients will reset their positions in this case.
-        game.player_client.send('s.r.'+ String(game.gamecore.local_time).replace('.','-'));
+                //now we tell them that the game is ready to start
+                //clients will reset their positions in this case.
+                game.player_client[i].send('s.r.'+ String(game.gamecore.local_time).replace('.','-'));
+            };
+
+
+        //server should get ready and reset stuff too
         game.player_host.send('s.r.'+ String(game.gamecore.local_time).replace('.','-'));
  
             //set this flag, so that the update loop can run it.
@@ -220,14 +254,14 @@
                 var game_instance = this.games[gameid];
 
                     //If the game is a player short
-                if(game_instance.player_count < 2) {
+                if(game_instance.player_count < 10) {
 
                         //someone wants us to join!
                     joined_a_game = true;
                         //increase the player count and store
                         //the player as the client of this game
-                    game_instance.player_client = player;
-                    game_instance.gamecore.players.other.instance = player;
+                    game_instance.player_client.push(player);
+                    game_instance.gamecore.allplayers.push(new game_player(game_instance.gamecore,player));
                     game_instance.player_count++;
 
                         //start running the game on the server,
