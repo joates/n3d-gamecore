@@ -1,4 +1,4 @@
-Original Source by FuzzYSpo0N. Forked and updated by Asad Memon.
+Original Source by FuzzYSpo0N. Forked and updated by Asad Memon. Special thanks to https://github.com/icemelt7
 CHANGES
 =========
 
