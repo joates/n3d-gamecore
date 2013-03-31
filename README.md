@@ -1,3 +1,11 @@
+Original Source by FuzzYSpo0N. Forked and updated by Asad Memon. Special thanks to https://github.com/icemelt7
+CHANGES
+=========
+
+- Client and Server files have been seperated for the sake of simplicity and security.
+- More than two players support has been added. (work in progress)
+
+
 Realtime Multiplayer In HTML5
 =============================
 
