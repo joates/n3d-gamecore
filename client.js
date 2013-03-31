@@ -1,3 +1,10 @@
+/*  Copyright (c) 2013 Asad Memon
+    
+    Forked and updated.
+
+    MIT Licensed.
+*/
+
 /*  Copyright (c) 2012 Sven "FuzzYspo0N" Bergström
     
     written by : http://underscorediscovery.com

@@ -1,3 +1,10 @@
+/*  Copyright (c) 2013 Asad Memon
+    
+    Forked and updated.
+
+    MIT Licensed.
+*/
+
 /*  Copyright (c) 2012 Sven "FuzzYspo0N" Bergström
     
     written by : http://underscorediscovery.com
@@ -584,18 +591,14 @@ game_core.prototype.client_process_net_updates = function() {
 }; //game_core.client_process_net_updates
 
 game_core.prototype.client_onserverupdate_recieved = function(data){
-    //console.log("data",data);
+
     //Store the server time (this is offset by the latency in the network, by the time we get it)
     this.server_time = data.t;
     //console.log("serv.update",data);
     //Update our local offset time from the last server update
     this.client_time = this.server_time - (this.net_offset/1000);
 
-    /*while(this.allplayers.length<data.vals.length) //add to array if more players joined
-    {
-        this.allplayers.push(new game_player(this));
-    }
-*/
+
     for (var i in data.vals) //loop for all players and set their player id
     {
         if (!this.allplayers[i]) 
@@ -603,23 +606,12 @@ game_core.prototype.client_onserverupdate_recieved = function(data){
         this.allplayers[i].state = "Player #" + i;
         this.allplayers[i].idingame = i;
     }
-    var mypos;
-    /*
-    if(this.allplayers.length>data.vals.length) //remove from array if some players left
-    {
-        this.allplayers = this.allplayers.splice(0,data.vals.length);
-        mypos = this.selfplayer.pos;
-        this.client_reset_positions();
-        this.allplayers[data.myi].resetpos(mypos);
-        this.server_updates.splice(0,this.server_updates.length);
-    }
-    */
+
 
     this.selfplayer = this.allplayers[data.myi]; //myi has my index. 
     this.selfplayer.myi = data.myi;
 
 
-    //this.selfplayer.state = "Player #" + (data.myi+1);
 
         //One approach is to set the position directly as the server tells you.
         //This is a common mistake and causes somewhat playable results on a local LAN, for example,
