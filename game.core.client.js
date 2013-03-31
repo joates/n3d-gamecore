@@ -72,55 +72,12 @@ if('undefined' != typeof(global)) frame_time = 45; //on server we run at 45ms, 2
     
         this.allplayers = Array();
 
-        this.allplayers.push(new game_player(this));
-        this.allplayers.push(new game_player(this));
 
-/*
-        this.players = {
-            self : this.allplayers[0],
-            other : this.allplayers[1]
-        };
-        */
         this.selfplayer = new game_player(this);
         
        
 
-            //Debugging ghosts, to help visualise things
-        //var twoghosts = {server:null,dest:null}; //struct for holding two ghosts i.e. server and dest.
-
-        //this.allghosts = new Array();
-
-        //add my own ghost...
-        /*
-        var tempg = new twoghosts();
-        tempg.server = new game_player(this);
-        tempg.dest = null;
-        this.allghosts.push(tempg);
-
-
-        this.ghosts = {
-                //Our ghost position on the server
-            server_pos_self : new game_player(this),
-                //The other players server position as we receive it
-            server_pos_other : new game_player(this),
-                //The other players ghost destination position (the lerp)
-            pos_other : new game_player(this)
-        };
-
-        this.ghosts.pos_other.state = 'dest_pos';
-
-        this.ghosts.pos_other.info_color = 'rgba(255,255,255,0.1)';
-
-        //this.selfplayer.ghostpos.info_color = 'rgba(255,255,255,0.2)';
-        this.ghosts.server_pos_other.info_color = 'rgba(255,255,255,0.2)';
-
-        this.ghosts.server_pos_self.state = 'server_pos';
-        this.ghosts.server_pos_other.state = 'server_pos';
-
-        this.selfplayer.ghostpos = { x:20, y:20 };
-        //this.ghosts.pos_other.pos = { x:500, y:200 };
-        //this.ghosts.server_pos_other.pos = { x:500, y:200 };
-*/
+        
             //The speed at which the clients move.
         this.playerspeed = 120;
 
@@ -594,7 +551,7 @@ game_core.prototype.client_onserverupdate_recieved = function(data){
 
     //Store the server time (this is offset by the latency in the network, by the time we get it)
     this.server_time = data.t;
-    //console.log("serv.update",data);
+    console.log("serv.update",data);
     //Update our local offset time from the last server update
     this.client_time = this.server_time - (this.net_offset/1000);
 
@@ -714,10 +671,11 @@ game_core.prototype.client_update = function() {
         //When we are doing client side prediction, we smooth out our position
         //across frames using local input states we have stored.
     this.client_update_local_position();
-
+console.log("p#",this.allplayers);
     for(var i in this.allplayers)
     {
         //Now they should have updated, we can draw the entities themselves
+
 
         this.allplayers[i].draw();
 
@@ -894,7 +852,7 @@ game_core.prototype.client_onreadygame = function(data) {
         var p = this.allplayers[i];
 
         //Store their info colors for clarity. give them some color in random until a color update comes
-        p.setrandomcolor();
+        //p.setrandomcolor();
 
         //Update their information
         p.state = "Player #"+(i+1);
@@ -902,7 +860,7 @@ game_core.prototype.client_onreadygame = function(data) {
     }
 
         //Make sure colors are synced up. Each has some random color.
-    this.socket.send('c.' + '#'+Math.floor(Math.random()*16777215).toString(16));
+    //this.socket.send('c.' + '#'+Math.floor(Math.random()*16777215).toString(16));
     /*
         //Store their info colors for clarity. server is always blue
     player_host.info_color = '#2288cc';
@@ -926,7 +884,7 @@ game_core.prototype.client_onjoingame = function(data) {
     this.selfplayer.host = false;
         //Update the local state
     this.selfplayer.state = 'connected.joined.waiting';
-    this.selfplayer.info_color = '#00bb00';
+    this.selfplayer.info_color = '#fff';
 
         //Make sure the positions match servers and other clients
     this.client_reset_positions();
@@ -947,7 +905,7 @@ game_core.prototype.client_onhostgame = function(data) {
 
         //Update debugging information to display state
     this.selfplayer.state = 'hosting.waiting for a player';
-    this.selfplayer.info_color = '#cc0000';
+    this.selfplayer.info_color = '#fff';
 
         //Make sure we start in the correct place as the host.
     this.client_reset_positions();
