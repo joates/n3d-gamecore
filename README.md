@@ -14,7 +14,10 @@ Realtime Multiplayer In HTML5
 Read the article here : 
 http://buildnewgames.com/real-time-multiplayer/
 
-View the demo here :
+View my demo here :
+http://multijs1.cloudapp.net:8080/?debug
+
+View two player original demo here :
 http://underscorediscovery.aws.af.cm/?debug
 
 An example using node.js, socket.io and HTML5 Canvas to explain and demonstrate realtime multiplayer games in the browser.
