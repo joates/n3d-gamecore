@@ -17,8 +17,8 @@
         this.destpos = { x:0, y:0 };
         this.size = { x:16, y:16, hx:8, hy:8 };
         this.state = 'not-connected';
-        this.color = 'rgba(255,255,255,0.1)';
-        this.info_color = 'rgba(255,255,255,0.1)';
+        this.color = 'rgba(255,255,255,1)';
+        this.info_color = 'rgba(255,255,255,1)';
         this.id = '';
         this.idingame=0;
 

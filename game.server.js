@@ -146,7 +146,7 @@
             //tell the player that they are now the host
             //s=server message, h=you are hosting
 
-        player.send('s.h.'+ String(thegame.gamecore.local_time).replace('.','-'));
+        //player.send('s.h.'+ String(thegame.gamecore.local_time).replace('.','-'));
         console.log('server host at  ' + thegame.gamecore.local_time);
         player.game = thegame;
         player.hosting = true;
@@ -261,7 +261,7 @@
                 var game_instance = this.games[gameid];
 
                     //If the game is a player short
-                if(game_instance.player_count < 10) {
+                if(game_instance.player_count < 3) {
 
                         //someone wants us to join!
                     joined_a_game = true;
@@ -276,7 +276,8 @@
                         //which will tell them to respawn/start
                     this.startGame(game_instance);
 
-                } //if less than 2 players
+                } //if less than room-limit of players
+                if (joined_a_game) break;
             } //for all games
 
                 //now if we didn't join a game,

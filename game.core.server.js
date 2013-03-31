@@ -89,7 +89,7 @@ require('./player.js');
 
         //The speed at which the clients move.
         this.playerspeed = 120;
-        this.playercount = 0; //used for player's gameid within this game.
+        this.playercount = 1; //used for player's gameid within this game.
 
         this.allplayers[0].idingame = this.playercount;
             //Set up some physics integration values
@@ -316,21 +316,10 @@ game_core.prototype.server_update = function(){
         var vals = {pos: this.allplayers[i].pos, isq: this.allplayers[i].last_input_seq };
         allpos[this.allplayers[i].idingame] = vals;
     }
-    /*
-    var allinput=new Array();
-    for (var i=0;i<this.allplayers.length;i++) //concat all clients input seq from our players array
-    {
-        allinput.push(this.allplayers[i].last_input_seq);
-    }
-*/
+
     this.laststate = {
         pc  : this.playercount,                      //player count
         vals : allpos,                               //all positions and inpseq
-        //isq : allinput,                             //all players input sequences
-        //hp  : this.allplayers[0].pos,                //'host position', the game creators position
-        //cp  : (this.allplayers[1])?this.allplayers[1].pos:null,               //'client position', the person that joined, their position
-        //his : this.allplayers[0].last_input_seq,     //'host input sequence', the last input we processed for the host
-        //cis : (this.allplayers[1])?this.allplayers[1].last_input_seq:null,    //'client input sequence', the last input we processed for the client
         t   : this.server_time                      // our current local time on the server
     };
 
@@ -396,10 +385,10 @@ game_core.prototype.player_connect = function(player) //someone entered the game
 game_core.prototype.player_disconnect = function(userid) //someone quit the game, delete him from our list!
 {
     for (var i = this.allplayers.length - 1; i >= 0; i--) {
-        console.log(i+"# "+this.allplayers[i].instance.userid);
+        //console.log(i+"# "+this.allplayers[i].instance.userid);
         if(this.allplayers[i].instance.userid == userid)
         {
-            console.log("DC user FOUND!!");
+            console.log("user left");
             this.allplayers.splice(i,1);
             break;
         }
