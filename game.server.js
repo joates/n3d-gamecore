@@ -261,7 +261,8 @@
                         //increase the player count and store
                         //the player as the client of this game
                     game_instance.player_client.push(player);
-                    game_instance.gamecore.allplayers.push(new game_player(game_instance.gamecore,player));
+                    //game_instance.gamecore.allplayers.push(new game_player(game_instance.gamecore,player));
+                    game_instance.gamecore.player_connect(player);
                     game_instance.player_count++;
 
                         //start running the game on the server,
