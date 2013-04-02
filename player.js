@@ -42,9 +42,9 @@
             //the server already knows who they are. If the server starts a game
             //with only a host, the other player is set up in the 'else' below
         if(player_instance) {
-            this.pos = { x:20, y:20 };
+            this.pos = { x:0, y:0 };
         } else {
-            this.pos = { x:20, y:20 };
+            this.pos = { x:0, y:0 };
         }
 
     }; //game_player.constructor
@@ -60,6 +60,7 @@
             //Draw a status update
         game.ctx.fillStyle = this.info_color;
         game.ctx.fillText(this.state, this.pos.x+10, this.pos.y + 4);
+        console.log(this.state,this.pos);
 
 
     

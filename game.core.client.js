@@ -72,7 +72,6 @@ if('undefined' != typeof(global)) frame_time = 45; //on server we run at 45ms, 2
     
         this.allplayers = Array();
 
-
         this.selfplayer = new game_player(this);
         
        
@@ -497,8 +496,8 @@ game_core.prototype.client_process_net_updates = function() {
             var other_server_pos = (latest_server_data.vals[i])? latest_server_data.vals[i].pos : 0;
 
             //The other players positions in this timeline, behind us and in front of us
-            var other_target_pos = (target.vals[i])? target.vals[i].pos:0;
-            var other_past_pos = (previous.vals[i])? previous.vals[i].pos:0;
+            var other_target_pos = (target.vals[i])? this.pos(target.vals[i].pos):0;
+            var other_past_pos = (previous.vals[i])? this.pos(previous.vals[i].pos):other_target_pos; //set to target if this guy is new
 
             //update the dest block, this is a simple lerp
             //to the target from the previous point in the server_updates buffer
@@ -555,6 +554,12 @@ game_core.prototype.client_onserverupdate_recieved = function(data){
     //Update our local offset time from the last server update
     this.client_time = this.server_time - (this.net_offset/1000);
 
+    if(data.vals.length<this.allplayers.length) //some player has left in this new update remove him
+    {
+        for (var i = this.allplayers.length - 1; i >= 0; i--) {
+            if (!data.vals[i]) delete this.allplayers[i];
+        };
+    }
 
     for (var i in data.vals) //loop for all players and set their player id
     {
@@ -563,6 +568,7 @@ game_core.prototype.client_onserverupdate_recieved = function(data){
         this.allplayers[i].state = "Player #" + i;
         this.allplayers[i].idingame = i;
     }
+
 
 
     this.selfplayer = this.allplayers[data.myi]; //myi has my index. 

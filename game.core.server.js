@@ -85,7 +85,7 @@ require('./player.js');
 
         //this.allplayers.push(new game_player(this));
 
-        this.allplayers[0].pos = {x:20,y:20};
+        //this.allplayers[0].pos = {x:20,y:20};
 
         //The speed at which the clients move.
         this.playerspeed = 120;
@@ -318,7 +318,7 @@ game_core.prototype.server_update = function(){
     }
 
     this.laststate = {
-        pc  : this.playercount,                      //player count
+        //pc  : this.playercount,                      //player count
         vals : allpos,                               //all positions and inpseq
         t   : this.server_time                      // our current local time on the server
     };
