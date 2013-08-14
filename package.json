@@ -1,0 +1,15 @@
+{
+  "name": "n3d-gamecore",
+  "author" : "joates",
+  "description": "2D & 3D multi-player core functionality game engine component.",
+  "license": "MIT",
+  "version": "0.0.0-alpha1",
+  "dependencies": {
+    "express": "3.3.x",
+    "socket.io": "0.9.x",
+    "node-uuid": "1.4.x",
+  },
+  "engine": {
+    "node": "0.10.x"
+  }
+}
