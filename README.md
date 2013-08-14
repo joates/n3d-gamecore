@@ -1,7 +1,8 @@
 ## n3d-gamecore (0.0.0-alpha1)
 
 checkout the 'dev' branch for the most recent build, the codebase is considered **ALPHA quality** only, should be OK to use but is 'unstable' because the API will probably change without notice. If you pull updates from 'dev' branch and it breaks your code, its on you, thats your warning. _Use at own risk_.
-You need will also need to have the *Three.js* library installed wherever you are hosting the server because it is not bundled with this component. See the (website)[http://threejs.org] for more info.
+
+You need will also need to have the *Three.js* library installed wherever you are hosting the server because it is not bundled with this component. See the [website](http://threejs.org) for more info.
 
 
 ####3D WebGL Multi-Player Game Engine (Node.js / Three.js / HTML5)
