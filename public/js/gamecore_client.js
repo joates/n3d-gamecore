@@ -28,6 +28,9 @@
   //  requestAnimationFrame polyfill by Erik Möller
   //  fixes from Paul Irish and Tino Zijdel
 
+  // DEBUG
+  var debug_count = 0
+
   var frame_time = 60 / 1000  // run the local game at 16ms/ 60hz
   if ('undefined' != typeof(global)) frame_time = 45  //on server we run at 45ms, 22hz
 
@@ -685,6 +688,20 @@
               this.allplayers[i].drawserverghost(map_offset_pos)
             }
           }
+  else {
+    // DEBUG
+    if (++debug_count % 90 === 0) {
+      console.log(this.selfplayer.last_input_seq +': ' + this.selfplayer.pos.x + ', ' + this.selfplayer.pos.z)
+
+      if (input_coords) {
+        var p = this.v_add(this.selfplayer.old_state.pos, input_coords)
+        console.log('predicted: ' + p.x + ', ' + p.z)
+      }
+      //console.log('actual:  ' + this.allplayers[i].pos.x + ', ' + this.allplayers[i].pos.z)
+      //console.log('self:    ' + this.selfplayer.pos.x + ', ' + this.selfplayer.pos.z)
+    }
+  }
+
         }
     
         // Work out the fps average

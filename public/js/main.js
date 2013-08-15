@@ -123,7 +123,7 @@
       cX = Math.min(Math.max(cX, -3), 3)
       cZ = Math.min(Math.max(cZ, -3), 3)
 
-      return { x:cX, z:cZ }
+      return { x:cX, y:0, z:cZ }
     }
   }
 
