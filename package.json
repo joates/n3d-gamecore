@@ -1,13 +1,31 @@
 {
   "name": "n3d-gamecore",
-  "author" : "joates",
   "description": "2D & 3D multi-player core functionality game engine component.",
+  "author": "joates",
   "license": "MIT",
-  "version": "0.0.0-alpha1",
+  "version": "0.0.1-alpha1",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:joates/n3d-gamecore.git"
+  },
+  "keywords": [
+    "3D",
+    "multi-player",
+    "HTML5",
+    "websockets",
+    "game server",
+    "game engine",
+    "mmog",
+    "three.js"
+  ],
+  "bugs": {
+    "url": "https://github.com/joates/n3d-gamecore/issues"
+  },
   "dependencies": {
     "express": "3.3.x",
     "socket.io": "0.9.x",
-    "node-uuid": "1.4.x",
+    "node-uuid": "1.4.x"
   },
   "engine": {
     "node": "0.10.x"
