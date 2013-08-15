@@ -1,9 +1,9 @@
 {
   "name": "n3d-gamecore",
-  "description": "2D & 3D multi-player core functionality game engine component.",
+  "description": "3D multi-player core functionality game engine component.",
   "author": "joates",
   "license": "MIT",
-  "version": "0.0.1-alpha1",
+  "version": "0.0.1-alpha",
   "main": "app.js",
   "repository": {
     "type": "git",

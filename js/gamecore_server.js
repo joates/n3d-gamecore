@@ -44,7 +44,7 @@
     if (! window.requestAnimationFrame) {
       window.requestAnimationFrame = function (callback, element) {
         var currTime = Date.now(), timeToCall = Math.max(0, frame_time - (currTime - lastTime))
-        var id = window.setTimeout(function() { callback(currTime + timeToCall )}, timeToCall)
+        var id = window.setTimeout(function() { callback(currTime + timeToCall) }, timeToCall)
         lastTime = currTime + timeToCall
         return id
       }
@@ -88,7 +88,7 @@
 
         this.allplayers[0].idingame = this.playercount
         // Set up some physics integration values
-        this._pdt = 0.0001                  //The physics update delta time
+        this._pdt  = 0.0001                 //The physics update delta time
         this._pdte = new Date().getTime()   //The physics update last delta time
         // A local timer for precision on server and client
         this.local_time = 0.016             //The local timer
@@ -152,7 +152,7 @@
       game_core.prototype.update = function(t) {
 
         // Work out the delta time
-        this.dt = this.lastframetime ? ( (t - this.lastframetime) / 1000.0).fixed() : 0.016
+        this.dt = this.lastframetime ? ((t - this.lastframetime) / 1000.0).fixed() : 0.016
 
         // Store the last frame time
         this.lastframetime = t
@@ -271,7 +271,6 @@
 
       game_core.prototype.server_update_physics = function() {
 
-
         for (var i=0, l=this.allplayers.length; i<l; i++) {
           // handle players
           this.allplayers[i].old_state.pos = this.pos(this.allplayers[i].pos)
@@ -296,16 +295,16 @@
 
         // Make a snapshot of the current state, for updating the clients
         var allpos = new Array()
-        for (var i=0, l=this.allplayers.length; i<l; i++) {  //concat all clients pos from our players array
+        for (var i=0, l=this.allplayers.length; i<l; i++) {  // concat all clients pos from our players array
           //console.log(this.allplayers[i].last_input_seq)
           var vals = { pos: this.allplayers[i].pos, isq: this.allplayers[i].last_input_seq }
           allpos[this.allplayers[i].idingame] = vals
         }
 
         this.laststate = {
-          //pc: this.playercount,                 //player count
-          vals: allpos,                           //all positions and inpseq
-          t:    this.server_time                  // our current local time on the server
+          //pc: this.playercount,       // player count
+          vals: allpos,                 // all positions and inpseq
+          t:    this.server_time        // our current local time on the server
         }
 
         for (var i=0, l=this.allplayers.length; i<l; i++) {

@@ -31,7 +31,7 @@
   var frame_time = 60 / 1000  // run the local game at 16ms/ 60hz
   if ('undefined' != typeof(global)) frame_time = 45  //on server we run at 45ms, 22hz
 
-  ;(function (){
+  ;(function() {
 
     var lastTime = 0
     var vendors = [ 'ms', 'moz', 'webkit', 'o' ]
@@ -44,7 +44,7 @@
     if (! window.requestAnimationFrame) {
       window.requestAnimationFrame = function (callback, element) {
         var currTime = Date.now(), timeToCall = Math.max(0, frame_time - (currTime - lastTime))
-        var id = window.setTimeout( function() { callback(currTime + timeToCall) }, timeToCall)
+        var id = window.setTimeout(function() { callback(currTime + timeToCall) }, timeToCall)
         lastTime = currTime + timeToCall
         return id
       }
@@ -71,9 +71,6 @@
         }
         */
 
-        // We create a player set, passing them
-        // the game that is running them, as well
-    
         this.allplayers = []
         this.selfplayer = new game_player(this)
 
@@ -81,12 +78,12 @@
         this.playerspeed = 120
 
         // Set up some physics integration values
-        this._pdt = 0.0001                 //The physics update delta time
-        this._pdte = new Date().getTime()  //The physics update last delta time
-            //A local timer for precision on server and client
-        this.local_time = 0.016            //The local timer
-        this._dt  = new Date().getTime()   //The local timer delta
-        this._dte = new Date().getTime()   //The local timer last frame time
+        this._pdt  = 0.0001                 //The physics update delta time
+        this._pdte = new Date().getTime()   //The physics update last delta time
+        // A local timer for precision on server and client
+        this.local_time = 0.016             //The local timer
+        this._dt  = new Date().getTime()    //The local timer delta
+        this._dte = new Date().getTime()    //The local timer last frame time
 
         // Start a physics loop, this is separate to the rendering
         // as this happens at a fixed frequency
@@ -172,7 +169,7 @@
         // Update the game specifics
         this.client_update()
 
-        //schedule the next update
+        // schedule the next update
         this.updateid = window.requestAnimationFrame(this.update.bind(this), this.viewport)
       }
 
@@ -233,6 +230,7 @@
         var x_dir = 0
         var y_dir = 0
         var z_dir = 0
+
         var ic = player.inputs.length
         if (ic) {
           for (var j=0; j<ic; ++j) {
@@ -257,7 +255,7 @@
           player.last_input_seq  = player.inputs[ic - 1].seq
         }
 
-        //give it back
+        // give it back
         return resulting_vector
       }
 
@@ -331,6 +329,7 @@
 
         // No updates...
         if (! this.server_updates.length) return
+        //return
 
         // The most recent server update
         var latest_server_data = this.server_updates[this.server_updates.length - 1]
@@ -341,7 +340,7 @@
         // Update the debug server position block
         this.selfplayer.ghostpos = this.pos(my_server_pos)
 
-        // here we handle our local input prediction ,
+        // here we handle our local input prediction,
         // by correcting it with the server and reconciling its differences
 
         var my_last_input_on_server = latest_server_data.vals[latest_server_data.myi].isq
@@ -471,7 +470,7 @@
 
           //this.selfplayer = this.allplayers[latest_server_data.myi]  //myi has my index.
 
-          // Now, if not predicting client movement , we will maintain the local player position
+          // Now, if not predicting client movement, we will maintain the local player position
           // using the same method, smoothing the players information from the past.
           if (! this.client_predict && ! this.naive_approach) {
 
@@ -592,7 +591,7 @@
 
   //
 
-      game_core.prototype.client_update_local_position = function(){
+      game_core.prototype.client_update_local_position = function() {
 
         if (this.client_predict) {
 
@@ -604,7 +603,7 @@
           var current_state = this.selfplayer.cur_state.pos
 
           // Make sure the visual position matches the states we have stored
-          //this.selfplayer.pos = this.v_add( old_state, this.v_mul_scalar( this.v_sub(current_state,old_state), t )  );
+          //this.selfplayer.pos = this.v_add(old_state, this.v_mul_scalar(this.v_sub(current_state,old_state), t))
           this.selfplayer.pos = current_state
 
           // TODO: collisions are ignored for now!
