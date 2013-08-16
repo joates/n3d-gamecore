@@ -24,7 +24,7 @@ http://buildnewgames.com/real-time-multiplayer/
 
 #### Getting started (Using npm package.json)
 * Get three.js (info [here](http://threejs.org))
-* `git clone` this repository cd `cd` into it
+* `git clone` this repository and `cd` into it
 * check that the links in `public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
 * Get node.js (info [here](http://nodejs.org/download/))
   * run `npm install` inside the cloned folder
