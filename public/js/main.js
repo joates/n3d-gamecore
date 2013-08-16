@@ -119,7 +119,7 @@
       // and avoid the additional calculations that follow..
       if ((cX > -0.1 && cX < 0.1) && (cZ > -0.1 && cZ < 0.1)) return
 
-      // clamp the values (4px is max velocity)
+      // clamp the values (i.e. max velocity)
       cX = Math.min(Math.max(cX, -3), 3)
       cZ = Math.min(Math.max(cZ, -3), 3)
 

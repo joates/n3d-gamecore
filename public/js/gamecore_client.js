@@ -387,10 +387,11 @@
 
         // First:
         // Find the position in the updates, on the timeline
-        // We call this current_time, then we find the past_pos and the target_pos using this,
-        // searching throught the server_updates array for current_time in between 2 other times.
+        // We call this current_time, then we find the past_pos
+        // and the target_pos using this, searching throught the
+        // server_updates array for current_time in between 2 other times.
         // Then:
-        // other player position = lerp ( past_pos, target_pos, current_time )
+        // other player position = lerp(past_pos, target_pos, current_time)
 
         // Find the position in the timeline of updates we stored.
         var current_time = this.client_time
@@ -398,10 +399,10 @@
         var target = null
         var previous = null
 
-        // We look from the 'oldest' updates, since the newest ones
-        // are at the end (list.length-1 for example). This will be expensive
-        // only when our time is not found on the timeline, since it will run all
-        // samples. Usually this iterates very little before breaking out with a target.
+        // We look from the 'oldest' updates, since the newest ones are at the
+        // end (list.length-1 for example). This will be expensive only when
+        // our time is not found on the timeline, since it will run all samples.
+        // Usually this iterates very little before breaking out with a target.
         for (var i=0; i<count; ++i) {
 
           var point = this.server_updates[i]
@@ -423,7 +424,7 @@
         }
 
         // Now that we have a target and a previous destination,
-        // We can interpolate between then based on 'how far in between' we are.
+        // We can interpolate between them based on 'how far in between' we are.
         // This is simple percentage maths, value/target = [0,1] range of numbers.
         // lerp requires the 0,1 value to lerp to? thats the one.
 
@@ -447,7 +448,7 @@
 
           for (var i in latest_server_data.vals) {
 
-            if (i < 1) continue
+            if (i == 0) continue
 
             // These are the exact server positions from this tick, but only for the ghost
             var other_server_pos = (latest_server_data.vals[i]) ? latest_server_data.vals[i].pos : 0
@@ -460,7 +461,7 @@
               // update the dest block, this is a simple lerp
               // to the target from the previous point in the server_updates buffer
               this.allplayers[i].ghostpos = this.pos(other_server_pos)
-              this.allplayers[i].destpos = this.v_lerp(other_past_pos, other_target_pos, time_point)
+              this.allplayers[i].destpos  = this.v_lerp(other_past_pos, other_target_pos, time_point)
 
               // apply smoothing from current pos to the new destination pos
               if (this.client_smoothing) {
@@ -471,18 +472,18 @@
             }
           }
 
-          //this.selfplayer = this.allplayers[latest_server_data.myi]  //myi has my index.
+          this.selfplayer = this.allplayers[latest_server_data.myi]  //myi has my index.
 
           // Now, if not predicting client movement, we will maintain the local player position
           // using the same method, smoothing the players information from the past.
           if (! this.client_predict && ! this.naive_approach) {
 
             // These are the exact server positions from this tick, but only for the ghost
-            var my_server_pos = latest_server_data.pos[latest_server_data.myi]
+            var my_server_pos = latest_server_data.vals[latest_server_data.myi].pos
 
             // The other players positions in this timeline, behind us and in front of us
-            var my_target_pos = target.pos[target.myi]
-            var my_past_pos = previous.pos[previous.myi]
+            var my_target_pos = target.vals[target.myi].pos
+            var my_past_pos = previous.vals[previous.myi].pos
 
             // Snap the ghost to the new server position
             this.selfplayer.ghostpos = this.pos(my_server_pos)
@@ -562,6 +563,9 @@
 
         if (this.naive_approach) {
           for (var i in data.vals) {
+
+            if (i == 0) continue
+
             // loop for all players
             this.allplayers[i].pos = this.pos(data.vals[i].pos)
           }
@@ -604,6 +608,14 @@
           // Then store the states for clarity,
           var old_state = this.selfplayer.old_state.pos
           var current_state = this.selfplayer.cur_state.pos
+
+// DEBUG
+if (++debug_count % 90 === 0) {
+  var debug_jump = this.v_sub(current_state, old_state)
+  if (debug_jump.x != 0 && debug_jump.z != 0) {
+    console.log('jump: ', debug_jump)
+  }
+}
 
           // Make sure the visual position matches the states we have stored
           //this.selfplayer.pos = this.v_add(old_state, this.v_mul_scalar(this.v_sub(current_state,old_state), t))
@@ -688,6 +700,7 @@
               this.allplayers[i].drawserverghost(map_offset_pos)
             }
           }
+  /**
   else {
     // DEBUG
     if (++debug_count % 90 === 0) {
@@ -701,6 +714,7 @@
       //console.log('self:    ' + this.selfplayer.pos.x + ', ' + this.selfplayer.pos.z)
     }
   }
+  */
 
         }
     
