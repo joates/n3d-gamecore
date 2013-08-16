@@ -28,9 +28,6 @@
   //  requestAnimationFrame polyfill by Erik Möller
   //  fixes from Paul Irish and Tino Zijdel
 
-  // DEBUG
-  var debug_count = 0
-
   var frame_time = 60 / 1000  // run the local game at 16ms/ 60hz
   if ('undefined' != typeof(global)) frame_time = 45  //on server we run at 45ms, 22hz
 
@@ -609,14 +606,6 @@
           var old_state = this.selfplayer.old_state.pos
           var current_state = this.selfplayer.cur_state.pos
 
-// DEBUG
-if (++debug_count % 90 === 0) {
-  var debug_jump = this.v_sub(current_state, old_state)
-  if (debug_jump.x != 0 && debug_jump.z != 0) {
-    console.log('jump: ', debug_jump)
-  }
-}
-
           // Make sure the visual position matches the states we have stored
           //this.selfplayer.pos = this.v_add(old_state, this.v_mul_scalar(this.v_sub(current_state,old_state), t))
           this.selfplayer.pos = current_state
@@ -700,22 +689,6 @@ if (++debug_count % 90 === 0) {
               this.allplayers[i].drawserverghost(map_offset_pos)
             }
           }
-  /**
-  else {
-    // DEBUG
-    if (++debug_count % 90 === 0) {
-      console.log(this.selfplayer.last_input_seq +': ' + this.selfplayer.pos.x + ', ' + this.selfplayer.pos.z)
-
-      if (input_coords) {
-        var p = this.v_add(this.selfplayer.old_state.pos, input_coords)
-        console.log('predicted: ' + p.x + ', ' + p.z)
-      }
-      //console.log('actual:  ' + this.allplayers[i].pos.x + ', ' + this.allplayers[i].pos.z)
-      //console.log('self:    ' + this.selfplayer.pos.x + ', ' + this.selfplayer.pos.z)
-    }
-  }
-  */
-
         }
     
         // Work out the fps average
@@ -767,10 +740,10 @@ if (++debug_count % 90 === 0) {
         this.naive_approach = false     // Whether or not to use the naive approach
         this.show_server_pos = false    // Whether or not to show the server position
         this.show_dest_pos = false      // Whether or not to show the interpolation goal
-        this.client_predict = true      // Whether or not the client is predicting input
+        this.client_predict = false     // Whether or not the client is predicting input
         this.input_seq = 0              // When predicting client inputs, we store the last input as a sequence number
         this.client_smoothing = true    // Whether or not the client side prediction tries to smooth things out
-        this.client_smooth = 25         // amount of smoothing to apply to client update dest
+        this.client_smooth = 3          // amount of smoothing to apply to client update dest
 
         this.net_latency = 0.001        // the latency between the client and the server (ping/2)
         this.net_ping = 0.001           // The round trip time from here to the server,and back
