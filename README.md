@@ -1,8 +1,8 @@
 ## n3d-gamecore (0.0.1-alpha)
 
-checkout the 'dev' branch for the most recent build, the codebase is considered **ALPHA quality** only, should be OK to use but is 'unstable' because the API will probably change without notice. If you pull updates from 'dev' branch and it breaks your code, its on you, thats your warning. _Use at own risk_.
+the codebase is considered **ALPHA quality** only, should be OK to use but is 'unstable' because the API will probably change without notice. If you pull updates from 'dev' branch and it breaks your code, its on you, *that* is your warning. _Use at own risk_.
 
-You will also need the *Three.js* library installed wherever you are hosting the server because it is not bundled with this component. See the [website](http://threejs.org) for more info.
+You will need to install the *Three.js* library wherever you are hosting the server because it is not bundled with this component. See the [website](http://threejs.org) for more info.
 
 
 ####3D WebGL Multi-Player Game Engine (Node.js / Three.js / HTML5)
@@ -14,35 +14,35 @@ This is **not** a fully functional game, it is intended to be a scalable realtim
 #### Change history
 * _Aug.2012_  Original Source by [Sven Bergström](https://github.com/underscorediscovery)
 * _Apr.2013_  Forked and updated by [Asad Memon](https://github.com/asadlionpk)
-* _Aug.2013_  Forked and extended to support both 2D & 3D by [joates](https://github.com/joates)
+* _Aug.2013_  Forked and extended to support 3D (as well as 2D) by [joates](https://github.com/joates)
 
 
 ## Realtime Multiplayer In HTML5
 
-Read the article here:
+Read the original article here (2D only): 
 http://buildnewgames.com/real-time-multiplayer/
 
 #### Getting started (Using npm package.json)
 * Get three.js (info [here](http://threejs.org))
+* `git clone` this repository cd `cd` into it
 * check that the links in `public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
 * Get node.js (info [here](http://nodejs.org/download/))
-* `git clone` this repository
-* run `npm install` inside the cloned folder
-* run `node app.js` inside the cloned folder
+  * run `npm install` inside the cloned folder
+  * run `node app.js` inside the cloned folder
 * Visit `http://localhost:8000` with your browser
-* use `http://localhost:8000/?debug` as the URL if you want to change the settings with `dat.gui.min.js`
+  * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
 
 #### Getting started (Manual install)
 * Get three.js (info [here](http://threejs.org))
+* `git clone` this repository and `cd` into it
 * check that the links in `public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
 * Get node.js (info [here](http://nodejs.org/download/))
-* `git clone` this repository
-* Install socket.io `npm install socket.io`
-* Install node-udid `npm install node-uuid`
-* Install express `npm install express`
+  * Install socket.io `npm install socket.io`
+  * Install node-udid `npm install node-uuid`
+  * Install express `npm install express`
 * Run node app.js inside the cloned folder
 * Visit `http://localhost:8000` with your browser
-* use `http://localhost:8000/?debug` as the URL if you want to change the settings with `dat.gui.min.js`
+  * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
 
 
 MIT Licensed.
