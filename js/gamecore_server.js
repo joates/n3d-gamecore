@@ -334,7 +334,8 @@
           if (input.length) {
             // convert string input values back into numeric data
             for (var i=0, l=input.length; i<l; i++) {
-              input[i] = parseInt(input[i].replace(',', '.'))
+              //input[i] = parseInt(input[i].replace(',', '.'))
+              input[i] = parseFloat(input[i].replace(',', '.'))
             }
 
             // Store the input on the player instance for processing in the physics loop
