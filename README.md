@@ -40,7 +40,7 @@ http://buildnewgames.com/real-time-multiplayer/
   * Install socket.io `npm install socket.io`
   * Install node-udid `npm install node-uuid`
   * Install express `npm install express`
-* Run node app.js inside the cloned folder
+* Run `node app.js` inside the cloned folder
 * Visit `http://localhost:8000` with your browser
   * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
 
