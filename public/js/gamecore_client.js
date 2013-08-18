@@ -343,7 +343,7 @@
         // here we handle our local input prediction,
         // by correcting it with the server and reconciling its differences
 
-        var my_last_input_on_server = latest_server_data.vals[latest_server_data.myi].seq
+        var my_last_input_on_server = latest_server_data.vals[latest_server_data.myi].isq
         if (my_last_input_on_server) {
           // The last input sequence index in my local input list
           var lastinputseq_index = -1
@@ -740,10 +740,10 @@
         this.naive_approach = false     // Whether or not to use the naive approach
         this.show_server_pos = false    // Whether or not to show the server position
         this.show_dest_pos = false      // Whether or not to show the interpolation goal
-        this.client_predict = true      // Whether or not the client is predicting input
+        this.client_predict = false     // Whether or not the client is predicting input
         this.input_seq = 0              // When predicting client inputs, we store the last input as a sequence number
         this.client_smoothing = true    // Whether or not the client side prediction tries to smooth things out
-        this.client_smooth = 25         // amount of smoothing to apply to client update dest
+        this.client_smooth = 12         // amount of smoothing to apply to client update dest
 
         this.net_latency = 0.001        // the latency between the client and the server (ping/2)
         this.net_ping = 0.001           // The round trip time from here to the server,and back
