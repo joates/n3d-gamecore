@@ -79,14 +79,19 @@
         }
         */
 
+        // issue #2
+        this.players = {}
+
         this.allplayers = []
-        this.allplayers.push(new game_player(this, this.instance.player_host))
+
+        // issue #2
+        //this.allplayers.push(new game_player(this, this.instance.player_host))
+        //this.allplayers[0].idingame = this.playercount
 
         // The speed at which the clients move.
         this.playerspeed = 120
-        this.playercount = 1  // used for player's gameid within this game.
+        this.playercount = 0  // used for player's gameid within this game.
 
-        this.allplayers[0].idingame = this.playercount
         // Set up some physics integration values
         this._pdt  = 0.0001                 //The physics update delta time
         this._pdte = new Date().getTime()   //The physics update last delta time
@@ -371,6 +376,11 @@
         this.playercount++
         var p = new game_player(this, player)
         this.allplayers.push(p)
+        this.allplayers[this.allplayers.length - 1].idingame = this.playercount
+
+        // issue #2
+        this.players[player.uuid] = p
+        //console.dir(this.players)
       }
 
   //
@@ -386,4 +396,7 @@
           }
           this.allplayers.filter(function(a) { return typeof a !== 'undefined' })
         }
+
+        // issue #2
+        delete this.players[uuid]
       }

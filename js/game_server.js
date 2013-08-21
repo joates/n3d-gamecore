@@ -97,15 +97,17 @@
             client.send('s.p.' + message_parts[1])
         } else if (message_type == 'c') {
 
+          // issue #3
+          /**
           // Client changed their color.
           client.game.player_host.send('s.c.' + message_parts[1])
 
-// issue #2
-//        // send changed color messages to all the other clients.
-//        for (var i=0, l=client.game.player_client.length; i<l; i++) {
-//          var p = client.game.player_client[i]
-//          p.send('s.c.' + message_parts[1])
-//        }
+          // send changed color messages to all the other clients.
+          for (var i=0, l=client.game.player_client.length; i<l; i++) {
+            var p = client.game.player_client[i]
+            p.send('s.c.' + message_parts[1])
+          }
+          */
 
         } else if (message_type == 'l') {
           // A client is asking for lag simulation
@@ -136,9 +138,12 @@
         // Create a new game instance
         var thegame = {
           uuid: uuid.v4({ rng: uuid.nodeRNG }),   // generate a new id for the game
-          player_host: player,                   // so we know who initiated the game
-          player_client: new Array(),           // nobody else joined yet, since its new
-          player_count: 1,                     // for simple checking of state
+
+          // issue #2
+          //player_host: player,                 // so we know who initiated the game
+          //player_client: [],                  // nobody else joined yet, since its new
+
+          player_count: 0,                     // for simple checking of state
           player_capacity: 1024 * 1024 * 0.5
         }
 
@@ -154,9 +159,9 @@
         thegame.gamecore.update(new Date().getTime())
 
         player.game = thegame
-// issue #2
-// this is not even used !!
-//      player.hosting = true
+
+        // issue #2
+        //player.hosting = true  // this is not even used !!
         
         this.log('   Game start: ' + color.white + player.game.uuid + color.reset + '   ')
 
@@ -229,24 +234,23 @@
 
       game_server.start_game = function(game) {
 
-// issue #2
-//      for (var i = game.player_client.length - 1; i >= 0; i--) {
-//        game.player_client[i].send('s.j.' + game.player_host.uuid)
-//        game.player_client[i].game = game
-//
-//        // now we tell them that the game is ready to start
-//        // clients will reset their positions in this case.
-//        game.player_client[i].send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
-//      }
+        // issue #2
+        /**
+        for (var i = game.player_client.length - 1; i >= 0; i--) {
+          game.player_client[i].send('s.j.' + game.player_host.uuid)
+          game.player_client[i].game = game
 
+          // now we tell them that the game is ready to start
+          // clients will reset their positions in this case.
+          game.player_client[i].send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
+        }
 
         //server should get ready and reset stuff too
         game.player_host.send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
- 
-// issue #2
-// this is not even used !!
-//      //set this flag, so that the update loop can run it.
-//      game.active = true
+
+        //set this flag, so that the update loop can run it.
+        game.active = true  // this is not even used !!
+        */
       }
 
   //
@@ -271,8 +275,9 @@
               joined_a_game = true
               // increase the player count and store
               // the player as the client of this game
-// issue #2
-//            game_instance.player_client.push(player)
+
+              // issue #2
+              //game_instance.player_client.push(player)
               game_instance.gamecore.player_connect(player)
               player.game = game_instance
               game_instance.player_count++
@@ -294,6 +299,8 @@
 
           //no games? create one!
           this.create_game(player)
+          // issue #2
+          this.join_game(player)    // and join it.
         }
       }
 

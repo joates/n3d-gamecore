@@ -9,7 +9,7 @@
   var game_player = function(game_instance, player_instance) {
 
     // Store the instance, if any
-    this.instance = player_instance
+    this.instance = player_instance || { uuid: '' }
     this.game = game_instance
 
     // Set up initial values for our state information
@@ -20,7 +20,7 @@
     this.state = 'not-connected'
     this.color = 'rgba(240,240,240,0.8)'
     this.info_color = 'rgba(220,240,220,0.8)'
-    this.uuid = ''
+    this.uuid = this.instance.uuid
     this.idingame = game_instance.playercount || 1
 
     // These are used in moving us around later
@@ -44,6 +44,8 @@
     }
     */
 
+    // issue #2
+    /**
     // The 'host' of a game gets created with a player instance since
     // the server already knows who they are. If the server starts a game
     // with only a host, the other player is set up in the 'else' below
@@ -54,6 +56,8 @@
       // players lerp from this position when they are reset ??
       this.pos = { x:-100, y:0, z:-100 }
     }
+    */
+
   }
 
   //
