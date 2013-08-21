@@ -100,11 +100,12 @@
           // Client changed their color.
           client.game.player_host.send('s.c.' + message_parts[1])
 
-          // send changed color messages to all the other clients.
-          for (var i=0, l=client.game.player_client.length; i<l; i++) {
-            var p = client.game.player_client[i]
-            p.send('s.c.' + message_parts[1])
-          }
+// issue #2
+//        // send changed color messages to all the other clients.
+//        for (var i=0, l=client.game.player_client.length; i<l; i++) {
+//          var p = client.game.player_client[i]
+//          p.send('s.c.' + message_parts[1])
+//        }
 
         } else if (message_type == 'l') {
           // A client is asking for lag simulation
@@ -153,7 +154,9 @@
         thegame.gamecore.update(new Date().getTime())
 
         player.game = thegame
-        player.hosting = true
+// issue #2
+// this is not even used !!
+//      player.hosting = true
         
         this.log('   Game start: ' + color.white + player.game.uuid + color.reset + '   ')
 
@@ -226,21 +229,24 @@
 
       game_server.start_game = function(game) {
 
-        for (var i = game.player_client.length - 1; i >= 0; i--) {
-          game.player_client[i].send('s.j.' + game.player_host.uuid)
-          game.player_client[i].game = game
-
-          // now we tell them that the game is ready to start
-          // clients will reset their positions in this case.
-          game.player_client[i].send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
-        }
+// issue #2
+//      for (var i = game.player_client.length - 1; i >= 0; i--) {
+//        game.player_client[i].send('s.j.' + game.player_host.uuid)
+//        game.player_client[i].game = game
+//
+//        // now we tell them that the game is ready to start
+//        // clients will reset their positions in this case.
+//        game.player_client[i].send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
+//      }
 
 
         //server should get ready and reset stuff too
         game.player_host.send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
  
-        //set this flag, so that the update loop can run it.
-        game.active = true
+// issue #2
+// this is not even used !!
+//      //set this flag, so that the update loop can run it.
+//      game.active = true
       }
 
   //
@@ -265,8 +271,10 @@
               joined_a_game = true
               // increase the player count and store
               // the player as the client of this game
-              game_instance.player_client.push(player)
+// issue #2
+//            game_instance.player_client.push(player)
               game_instance.gamecore.player_connect(player)
+              player.game = game_instance
               game_instance.player_count++
 
               // start running the game on the server,
