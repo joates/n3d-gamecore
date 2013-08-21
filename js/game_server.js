@@ -138,13 +138,8 @@
         // Create a new game instance
         var thegame = {
           uuid: uuid.v4({ rng: uuid.nodeRNG }),   // generate a new id for the game
-
-          // issue #2
-          //player_host: player,                 // so we know who initiated the game
-          //player_client: [],                  // nobody else joined yet, since its new
-
-          player_count: 0,                     // for simple checking of state
-          player_capacity: 1024 * 1024 * 0.5
+          player_count: 0,                        // for simple checking of state
+          player_capacity: 1024 * 1024 * 0.5      // 524,288 max
         }
 
         // Store it in the list of game
@@ -158,11 +153,9 @@
         // Start updating the game loop on the server
         thegame.gamecore.update(new Date().getTime())
 
+        // the client needs to know which game it is connected to.
         player.game = thegame
 
-        // issue #2
-        //player.hosting = true  // this is not even used !!
-        
         this.log('   Game start: ' + color.white + player.game.uuid + color.reset + '   ')
 
         // return the new game instance.
@@ -187,43 +180,11 @@
           // no players, stop the game updates
           thegame.gamecore.stop_update()
 
-          // TODO: why checking again for players ?
-          // this is probably redundant.. commented, see if it breaks !!
-          /**
-          if (thegame.player_count > 0) {
+          // remove the game.
+          delete this.games[game_uuid]
+          this.game_count--
 
-            // send the players the message the game is ending
-            if (client_uuid == thegame.player_host.uuid) {
-
-               //the host left, oh snap. Lets try join another game
-               if (thegame.player_client) {
-
-                 for (var i=thegame.player_client.length - 1; i>=0; i--) {
-                   //tell them the game is over
-                   thegame.player_client[i].send('s.e')
-                   //now look for/create a new game.
-                   this.join_game(thegame.player_client[i])
-                 }
-               }
-                    
-             } else {
-               //the other player left, we were hosting
-               if(thegame.player_host) {
-                  //tell the client the game is ended
-                  thegame.player_host.send('s.e')
-                  //i am no longer hosting, this game is going down
-                  thegame.player_host.hosting = false
-                  //now look for/create a new game.
-                  this.join_game(thegame.player_host)
-                }
-              }
-            }
-            */
-
-            delete this.games[game_uuid]
-            this.game_count--
-
-            this.log('   Game ended: ' + color.red + game_uuid + color.reset + '   ' )
+          this.log('   Game ended: ' + color.red + game_uuid + color.reset + '   ' )
 
         } else {
             this.log(color.red + '!! ## Error: Game was not found ## !!' + color.reset + '  ' + game_uuid)
@@ -293,6 +254,8 @@
             //now if we didn't join a game, we create one
             if (! joined_a_game) {
               this.create_game(player)
+              // issue #2
+              this.join_game(player)    // and join it.
             }
 
           } else {
