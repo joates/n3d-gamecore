@@ -9,7 +9,7 @@
   var game_player = function(game_instance, player_instance) {
 
     // Store the instance, if any
-    this.instance = player_instance || { uuid: '' }
+    this.instance = player_instance
     this.game = game_instance
     this.index = game_instance.playercount || 1
 
@@ -21,7 +21,6 @@
     this.state = 'not-connected'
     this.color = 'rgba(240,240,240,0.8)'
     this.info_color = 'rgba(220,240,220,0.8)'
-    this.uuid = this.instance.uuid
 
     // These are used in moving us around later
     this.old_state = { pos: { x:0, y:0, z:0 } }

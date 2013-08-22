@@ -72,10 +72,11 @@
         */
 
         // issue #2
-        this.player_set = {}
+        this.player_self = {}  // the client player
+        this.player_set  = {}  // other players (within range)
 
         this.allplayers = []
-        this.selfplayer = new game_player(this)
+        this.selfplayer = new game_player(this)  // just a placeholder
 
         // The speed at which the clients move.
         this.playerspeed = 120
@@ -552,6 +553,15 @@
           }
         }
 
+        // issue #2
+        if (this.player_self && this.player_self.uuid != undefined) {
+          var temp_uuid = this.player_self.uuid
+          this.player_self = this.allplayers[data.myi]
+          this.player_self.uuid = temp_uuid
+        } else {
+          throw Error('Cannot create a player_self object without a valid uuid: player #'+data.myi)
+        }
+
         this.selfplayer = this.allplayers[data.myi]  //myi has my index. 
         this.selfplayer.myi = data.myi
 
@@ -918,7 +928,10 @@
         // The server responded that we are now in a game,
         // this lets us store the information about ourselves and set the colors
         // to show we are now ready to be playing.
-        this.selfplayerid = data.id
+
+        // issue #2
+        this.player_self.uuid = data.id
+
         this.selfplayer.info_color = '#cc0000'
         this.selfplayer.state = 'connected'
         this.selfplayer.online = true

@@ -299,16 +299,20 @@
         this.server_time = this.local_time
 
         // Make a snapshot of the current state, for updating the clients
-        var allpos = new Array()
+        var _allpos = {}
+          ,  allpos = []
         for (var i=0, l=this.allplayers.length; i<l; i++) {  // concat all clients pos from our players array
           //console.log(this.allplayers[i].last_input_seq)
           var vals = { pos: this.allplayers[i].pos, isq: this.allplayers[i].last_input_seq }
+          // issue #2
+          _allpos[this.allplayers[i].instance.uuid] = vals
           allpos[this.allplayers[i].index] = vals
         }
 
         this.laststate = {
-          //pc: this.playercount,       // player count
-          vals: allpos,                 // all positions and inpseq
+          // issue #2
+          _vals: _allpos,               // issue #2: all pos and inpseq
+          vals:  allpos,                // all positions and inpseq
           t:    this.server_time        // our current local time on the server
         }
 
