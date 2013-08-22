@@ -80,7 +80,7 @@
         */
 
         // issue #2
-        this.players = {}
+        this.player_manifest = {}
 
         this.allplayers = []
 
@@ -303,7 +303,7 @@
         for (var i=0, l=this.allplayers.length; i<l; i++) {  // concat all clients pos from our players array
           //console.log(this.allplayers[i].last_input_seq)
           var vals = { pos: this.allplayers[i].pos, isq: this.allplayers[i].last_input_seq }
-          allpos[this.allplayers[i].idingame] = vals
+          allpos[this.allplayers[i].index] = vals
         }
 
         this.laststate = {
@@ -314,7 +314,7 @@
 
         for (var i=0, l=this.allplayers.length; i<l; i++) {
           // this users array index to be sent too. (for parsing data accordingly)
-          this.laststate.myi = this.allplayers[i].idingame
+          this.laststate.myi = this.allplayers[i].index
           // Send the snapshot to the player
           if (this.allplayers[i].instance) {
             this.allplayers[i].instance.emit('onserverupdate', this.laststate)
@@ -376,11 +376,11 @@
         this.playercount++
         var p = new game_player(this, player)
         this.allplayers.push(p)
-        this.allplayers[this.allplayers.length - 1].idingame = this.playercount
+        this.allplayers[this.allplayers.length - 1].index = this.playercount
 
         // issue #2
-        this.players[player.uuid] = p
-        //console.dir(this.players)
+        this.player_manifest[player.uuid] = p
+        //console.dir(this.player_manifest)
       }
 
   //
@@ -398,5 +398,5 @@
         }
 
         // issue #2
-        delete this.players[uuid]
+        delete this.player_manifest[uuid]
       }

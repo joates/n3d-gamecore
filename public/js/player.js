@@ -11,6 +11,7 @@
     // Store the instance, if any
     this.instance = player_instance || { uuid: '' }
     this.game = game_instance
+    this.index = game_instance.playercount || 1
 
     // Set up initial values for our state information
     this.pos = { x:0, y:0, z:0 }
@@ -21,7 +22,6 @@
     this.color = 'rgba(240,240,240,0.8)'
     this.info_color = 'rgba(220,240,220,0.8)'
     this.uuid = this.instance.uuid
-    this.idingame = game_instance.playercount || 1
 
     // These are used in moving us around later
     this.old_state = { pos: { x:0, y:0, z:0 } }

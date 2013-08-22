@@ -71,6 +71,9 @@
         }
         */
 
+        // issue #2
+        this.player_set = {}
+
         this.allplayers = []
         this.selfplayer = new game_player(this)
 
@@ -510,13 +513,13 @@
         *
         *  IMPORTANT NOTE:
         *
-        *  1. the vals array is indexed using idingame which can
+        *  1. the vals array is indexed using 'player.index' which can
         *     never have a zero value, but the array is ALWAYS
         *     padded with a [0] element !!
         *
         *  2. the length of the vals array is not how many users
         *     are currently in our local game simulation, it goes
-        *     from [0] up to the highest player.idingame which
+        *     from [0] up to the highest 'player.index' which
         *     potentially can have many undefined elements as the
         *     number of connected players climbs (not scalable !!)
         */
@@ -545,7 +548,7 @@
 
           if (this.allplayers[i]) {
             this.allplayers[i].state = "Player #" + i
-            this.allplayers[i].idingame = i
+            this.allplayers[i].index = i
           }
         }
 
