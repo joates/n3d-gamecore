@@ -554,6 +554,7 @@
         }
 
         // issue #2
+        /**
         if (this.player_self && this.player_self.uuid != undefined) {
           var temp_uuid = this.player_self.uuid
           this.player_self = this.allplayers[data.myi]
@@ -561,6 +562,7 @@
         } else {
           throw Error('Cannot create a player_self object without a valid uuid: player #'+data.myi)
         }
+        */
 
         this.selfplayer = this.allplayers[data.myi]  //myi has my index. 
         this.selfplayer.myi = data.myi
@@ -1087,22 +1089,57 @@
 
   //
 
-// DEBUG
-var debug_count = 0
-  , debug_state = true
+      game_core.prototype.n3d_remove_player = function(id) {
+        // at some point we may need to cleanup player_set
+        // removing out-of-range players with no recent updates.
+      }
+
+  //
+
+      game_core.prototype.n3d_add_player = function(id) {
+        // need player to exist so we can apply the update.
+        this.player_set[id] = new game_player(this)
+        this.player_set[id].state = this.player_set[id].index ? 'orange' : 'yellow'
+        scene_add_mesh(this.player_set[id], this.player_set[id].index)
+        console.log("created player: " + id)
+      }
+
+  //
 
       // issue #2
       game_core.prototype.n3d_onserverupdate_received = function(data) {
 
-        //this.server_time = data.t
-        //this.client_time = this.server_time - (this.net_offset / 1000)
+        this.server_time = data.t
+        this.client_time = this.server_time - (this.net_offset / 1000)
 
-        if (debug_state && ++debug_count > 100 && debug_count % 60 === 0) {
-          for (var id in data.vals) {
-            console.log(id)
+        for (var id in data.vals) {
+
+          // player must exist before it can be updated.
+          if (this.player_set[id] == undefined) this.n3d_add_player(id)
+
+          if (this.naive_approach) {
+            this.player_set[id].pos = this.pos(data.vals[id].pos)
+
+          } else {
+
+            this.server_updates.push(data)
+
+            if (this.server_updates.length >= (60 * this.buffer_size)) {
+              this.server_updates.splice(0, 1)
+            }
+
+            this.oldest_tick = this.server_updates[0].t
+
+            this.n3d_process_net_prediction_correction()
           }
+        }
 
-          debug_state = false
+        // make sure the player_self shortcut is valid.
+        if (this.player_self.pos == undefined) {
+          this.player_self = this.player_set[data.uuid]
+          this.player_self.uuid = data.uuid
+        } else {
+          throw Error('Cannot create a player_self object without a valid uuid: player #'+data.myi)
         }
       }
 
