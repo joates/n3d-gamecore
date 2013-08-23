@@ -608,23 +608,6 @@
 
   //
 
-// DEBUG
-var debug_count = 0
-  , debug_state = true
-
-      // issue #2
-      game_core.prototype.client_on_server_update_recieved = function(data) {
-
-// DEBUG
-if (debug_state && ++debug_count > 100 && debug_count % 60 === 0) {
-  console.log(data)
-  debug_state = false
-}
-
-      }
-
-  //
-
       game_core.prototype.client_update_local_position = function() {
 
         if (this.client_predict) {
@@ -1045,7 +1028,7 @@ if (debug_state && ++debug_count > 100 && debug_count % 60 === 0) {
         this.socket.on('onserverupdate', this.client_onserverupdate_recieved.bind(this))
 
         // issue #2
-        this.socket.on('on_server_update', this.client_on_server_update_recieved.bind(this))
+        this.socket.on('on_server_update', this.n3d_onserverupdate_received.bind(this))
 
         // Handle when we connect to the server, showing state and storing id's.
         this.socket.on('onconnected', this.client_onconnected.bind(this))
@@ -1100,5 +1083,46 @@ if (debug_state && ++debug_count > 100 && debug_count % 60 === 0) {
 
         // Reset the style back to full white.
         this.ctx.fillStyle = 'rgba(255,255,255,1)'
+      }
+
+  //
+
+// DEBUG
+var debug_count = 0
+  , debug_state = true
+
+      // issue #2
+      game_core.prototype.n3d_onserverupdate_received = function(data) {
+
+        //this.server_time = data.t
+        //this.client_time = this.server_time - (this.net_offset / 1000)
+
+        if (debug_state && ++debug_count > 100 && debug_count % 60 === 0) {
+          for (var id in data.vals) {
+            console.log(id)
+          }
+
+          debug_state = false
+        }
+      }
+
+  //
+
+      game_core.prototype.n3d_process_net_prediction_correction = function() {
+      }
+
+  //
+
+      game_core.prototype.n3d_update_physics = function() {
+      }
+
+  //
+
+      game_core.prototype.n3d_update_local_position = function() {
+      }
+
+  //
+
+      game_core.prototype.n3d_process_input = function() {
       }
 
