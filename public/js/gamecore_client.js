@@ -608,6 +608,23 @@
 
   //
 
+// DEBUG
+var debug_count = 0
+  , debug_state = true
+
+      // issue #2
+      game_core.prototype.client_on_server_update_recieved = function(data) {
+
+// DEBUG
+if (debug_state && ++debug_count > 100 && debug_count % 60 === 0) {
+  console.log(data)
+  debug_state = false
+}
+
+      }
+
+  //
+
       game_core.prototype.client_update_local_position = function() {
 
         if (this.client_predict) {
@@ -1026,6 +1043,10 @@
         this.socket.on('disconnect', this.client_ondisconnect.bind(this))
         // Sent each tick of the server simulation. This is our authoritive update
         this.socket.on('onserverupdate', this.client_onserverupdate_recieved.bind(this))
+
+        // issue #2
+        this.socket.on('on_server_update', this.client_on_server_update_recieved.bind(this))
+
         // Handle when we connect to the server, showing state and storing id's.
         this.socket.on('onconnected', this.client_onconnected.bind(this))
         // On error we just show that we are not connected for now. Can print the data.

@@ -299,19 +299,15 @@
         this.server_time = this.local_time
 
         // Make a snapshot of the current state, for updating the clients
-        var _allpos = {}
-          ,  allpos = []
+        var allpos = []
+
         for (var i=0, l=this.allplayers.length; i<l; i++) {  // concat all clients pos from our players array
-          //console.log(this.allplayers[i].last_input_seq)
+          //console.log(i + ': ', this.allplayers[i].last_input_seq)
           var vals = { pos: this.allplayers[i].pos, isq: this.allplayers[i].last_input_seq }
-          // issue #2
-          _allpos[this.allplayers[i].instance.uuid] = vals
           allpos[this.allplayers[i].index] = vals
         }
 
         this.laststate = {
-          // issue #2
-          _vals: _allpos,               // issue #2: all pos and inpseq
           vals:  allpos,                // all positions and inpseq
           t:    this.server_time        // our current local time on the server
         }
@@ -322,6 +318,43 @@
           // Send the snapshot to the player
           if (this.allplayers[i].instance) {
             this.allplayers[i].instance.emit('onserverupdate', this.laststate)
+          }
+        }
+
+        // issue #2
+        var packet = this.server_prepare_update()
+        this.server_transmit_update(packet)
+      }
+
+  //
+
+      // issue #2
+      game_core.prototype.server_prepare_update = function() {
+        var packet = {}
+
+        for (var id in this.player_manifest) {
+          packet[id] = {
+            pos: this.player_manifest[id].pos,
+            isq: this.player_manifest[id].last_input_seq || 0
+          }
+        }
+
+        return packet
+      }
+
+  //
+
+      // issue #2
+      game_core.prototype.server_transmit_update = function(packet) {
+        this.last_state = {
+          vals: packet,
+          t:    this.server_time
+        }
+
+        for (var id in this.player_manifest) {
+          this.last_state.uuid = id
+          if (this.player_manifest[id].instance) {
+            this.player_manifest[id].instance.emit('on_server_update', this.last_state)
           }
         }
       }
