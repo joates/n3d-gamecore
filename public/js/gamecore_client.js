@@ -1191,6 +1191,12 @@
   //
 
       game_core.prototype.n3d_update_physics = function() {
+        if (this.client_predict) {
+          this.player_self.old_state.pos = this.pos(this.player_self.cur_state.pos)
+          var nd = this.n3d_process_input(this.player_self)
+          this.player_self.cur_state.pos = this.v_add(this.player_self.old_state.pos, nd)
+          this.player_self.state_time = this.local_time
+        }
       }
 
   //
