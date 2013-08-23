@@ -1135,17 +1135,57 @@
         }
 
         // make sure the player_self shortcut is valid.
+        // this should only happen once !! TODO: [Test]
         if (this.player_self.pos == undefined) {
           this.player_self = this.player_set[data.uuid]
           this.player_self.uuid = data.uuid
-        } else {
-          throw Error('Cannot create a player_self object without a valid uuid: player #'+data.myi)
         }
       }
 
   //
 
       game_core.prototype.n3d_process_net_prediction_correction = function() {
+
+        // No updates...
+        if (! this.server_updates.length) return
+
+        // The most recent server update
+        var latest_server_data = this.server_updates[this.server_updates.length - 1]
+
+        // Our latest server position
+        var my_server_pos = latest_server_data.vals[latest_server_data.uuid].pos
+
+        // here we handle our local input prediction,
+        // by correcting it with the server and reconciling its differences
+
+        var my_last_input_on_server = latest_server_data.vals[latest_server_data.uuid].isq
+        if (my_last_input_on_server) {
+          // The last input sequence index in my local input list
+          var lastinputseq_index = -1
+          // Find this input in the list, and store the index
+          for (var i=0, l=this.player_self.inputs.length; i<l; ++i) {
+            if (this.player_self.inputs[i].seq == my_last_input_on_server) {
+              lastinputseq_index = i
+              break
+            }
+          }
+
+          // Now we can crop the list of any updates we have already processed
+          if (lastinputseq_index != -1) {
+
+            // remove the rest of the inputs we have confirmed on the server
+            var number_to_clear = Math.abs(lastinputseq_index - (-1))
+            this.player_self.inputs.splice(0, number_to_clear)
+            // The player is now located at the new server position, authoritive server
+            this.player_self.cur_state.pos = this.pos(my_server_pos)
+            this.player_self.last_input_seq = lastinputseq_index
+            // Now we reapply all the inputs that we have locally that
+            // the server hasn't yet confirmed. This will 'keep' our position the same,
+            // but also confirm the server position at the same time.
+            this.n3d_update_physics()
+            this.n3d_update_local_position()
+          }
+        }
       }
 
   //
