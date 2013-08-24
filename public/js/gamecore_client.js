@@ -1223,6 +1223,38 @@
 
   //
 
-      game_core.prototype.n3d_process_input = function() {
+      game_core.prototype.n3d_process_input = function(player) {
+        // It's possible to have recieved multiple inputs by now,
+        // so we process each one
+        var x_dir = 0
+        var y_dir = 0
+        var z_dir = 0
+
+        var ic = player.inputs.length
+        if (ic) {
+          for (var j=0; j<ic; ++j) {
+            // don't process ones we already have simulated locally
+            if (player.inputs[j].seq <= player.last_input_seq) continue
+
+            var input = player.inputs[j].inputs
+            var c = input.length
+
+            for (var i=0; i<c; i+=2) {
+              x_dir = input[i]
+              z_dir = input[i + 1]
+            }
+          }
+        }
+
+        // we have a direction vector now, so apply the same physics as the client
+        var resulting_vector = this.physics_movement_vector_from_direction(x_dir, y_dir, z_dir)
+        if (player.inputs.length) {
+          // we can now clear the array since these have been processed
+          player.last_input_time = player.inputs[ic - 1].time
+          player.last_input_seq  = player.inputs[ic - 1].seq
+        }
+
+        // give it back
+        return resulting_vector
       }
 
