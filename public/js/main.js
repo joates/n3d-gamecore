@@ -178,6 +178,17 @@
 
   //
 
+  // issue #2
+  function n3d_scene_add_mesh(p, id) {
+    var g = new THREE.CylinderGeometry( 2.6, 3, 2.2, 32, 32, false )
+    var m = new THREE.MeshLambertMaterial({ color: p.color })
+    n3d_players[id] = new THREE.Mesh( g, m )
+    n3d_players[id].position.copy(p.pos)
+    scene.add(n3d_players[id])
+  }
+
+  //
+
   function scene_render() {
     renderer.render(scene, camera)
   }
@@ -190,17 +201,6 @@
     players[idx] = new THREE.Mesh( g, m )
     players[idx].position.copy(p.pos)
     scene.add(players[idx])
-  }
-
-  //
-
-  // issue #2
-  function n3d_scene_add_mesh(p, id) {
-    var g = new THREE.CylinderGeometry( 2.6, 3, 2.2, 32, 32, false )
-    var m = new THREE.MeshLambertMaterial({ color: p.color })
-    n3d_players[id] = new THREE.Mesh( g, m )
-    n3d_players[id].position.copy(p.pos)
-    scene.add(n3d_players[id])
   }
 
   //

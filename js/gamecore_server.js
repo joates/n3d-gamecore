@@ -437,3 +437,24 @@
         // issue #2
         delete this.player_manifest[uuid]
       }
+
+  //
+
+      game_core.prototype.n3d_handle_server_input = function(client, input, input_time, input_seq) {
+
+        var player_client = this.player_manifest[client.uuid]
+
+        if (player_client && player_client.inputs) {
+          if (input.length) {
+            // convert string input values back into numeric data
+            for (var i=0, l=input.length; i<l; i++) {
+              //input[i] = parseInt(input[i].replace(',', '.'))
+              input[i] = parseFloat(input[i].replace(',', '.'))
+            }
+
+            // Store the input on the player instance for processing in the physics loop
+            player_client.inputs.push({ inputs: input, time: input_time, seq: input_seq })
+          }
+        }
+      }
+

@@ -17,6 +17,7 @@
    *  MIT Licensed.
    */
 
+  var n3d_state = false
 
   //  The main update loop runs on requestAnimationFrame,
   //  Which falls back to a setTimeout loop on the server
@@ -173,8 +174,11 @@
         // Update the game specifics
 
         // issue #2
-        //this.client_update()
-        this.n3d_client_update()
+        if (n3d_state) {
+          this.n3d_client_update()
+        } else {
+          this.client_update()
+        }
 
         // schedule the next update
         this.updateid = window.requestAnimationFrame(this.update.bind(this), this.viewport)
@@ -505,7 +509,7 @@
 
   //
 
-      game_core.prototype.client_onserverupdate_recieved = function(data) {
+      game_core.prototype.client_onserverupdate_received = function(data) {
 
         // Store the server time (this is offset by the latency in the network, by the time we get it)
         this.server_time = data.t
@@ -662,10 +666,7 @@
         else this.scene.style.visibility = 'visible'
 
         // Update & Render the 3D scene.
-        //var input_coords = scene_update(this.allplayers)
-
-        // issue #2
-        var input_coords = n3d_scene_update(this.player_set, this.player_self.uuid)
+        var input_coords = scene_update(this.allplayers)
         scene_render()
 
         // 2D viewport (player map)
@@ -1032,11 +1033,14 @@
 
         // Sent when we are disconnected (network, server down, etc)
         this.socket.on('disconnect', this.client_ondisconnect.bind(this))
-        // Sent each tick of the server simulation. This is our authoritive update
-        //this.socket.on('onserverupdate', this.client_onserverupdate_recieved.bind(this))
 
         // issue #2
-        this.socket.on('on_server_update', this.n3d_onserverupdate_received.bind(this))
+        if (n3d_state) {
+          this.socket.on('on_server_update', this.n3d_onserverupdate_received.bind(this))
+        } else {
+          // Sent each tick of the server simulation. This is our authoritive update
+          this.socket.on('onserverupdate', this.client_onserverupdate_received.bind(this))
+        }
 
         // Handle when we connect to the server, showing state and storing id's.
         this.socket.on('onconnected', this.client_onconnected.bind(this))
@@ -1095,6 +1099,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_remove_player = function(id) {
         // at some point we may need to cleanup player_set
         // removing out-of-range players with no recent updates.
@@ -1102,6 +1107,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_add_player = function(id) {
         // need player to exist so we can apply the update.
         this.player_set[id] = new game_player(this)
@@ -1150,6 +1156,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_process_net_prediction_correction = function() {
 
         // No updates...
@@ -1196,6 +1203,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_update_physics = function() {
         if (this.client_predict) {
           this.player_self.old_state.pos = this.pos(this.player_self.cur_state.pos)
@@ -1207,6 +1215,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_update_local_position = function() {
         if (this.client_predict) {
 
@@ -1229,6 +1238,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_process_input = function(player) {
         // It's possible to have recieved multiple inputs by now,
         // so we process each one
@@ -1266,6 +1276,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_client_update = function() {
 
         // 2D Viewport visibility.
@@ -1277,9 +1288,6 @@
         else this.scene.style.visibility = 'visible'
 
         // Update & Render the 3D scene.
-        //var input_coords = scene_update(this.allplayers)
-
-        // issue #2
         var input_coords = n3d_scene_update(this.player_set, this.player_self.uuid)
         scene_render()
 
@@ -1290,7 +1298,7 @@
         this.client_draw_info()
 
         // Capture inputs from the player
-        this.client_handle_input(input_coords)
+        this.n3d_handle_input(input_coords)
 
         // Network player just gets drawn normally, with interpolation from
         // the server updates, smoothing out the positions from the past.
@@ -1302,7 +1310,7 @@
 
         // When we are doing client side prediction, we smooth out our position
         // across frames using local input states we have stored.
-        this.n3d_client_update_local_position()
+        this.n3d_update_local_position()
 
         // need the client players position to use when calculating map view.
         var map_offset_pos = this.player_self.pos
@@ -1333,6 +1341,7 @@
 
   //
 
+      // issue #2
       game_core.prototype.n3d_process_net_updates = function() {
 
         // No updates...
@@ -1447,6 +1456,53 @@
               this.player_self.pos = this.pos(local_target)
             }
           }
+        }
+      }
+
+  //
+
+      // issue #2
+      game_core.prototype.n3d_handle_input = function(inpt) {
+
+        // This takes input from the client and keeps a record,
+        // It also sends the input information to the server immediately
+        // as it is pressed. It also tags each input with a sequence number.
+
+        if (! inpt) return { x:0, y:0, z:0 }
+
+        var x_dir = inpt.x
+        var y_dir = 0
+        var z_dir = inpt.z
+
+        if (inpt.x != 0 && inpt.z != 0) {
+
+          // Update what sequence we are on now
+          this.input_seq += 1
+
+          // Store the input state as a snapshot of what happened.
+          this.player_self.inputs.push({
+            inputs: [ inpt.x, inpt.z ],
+            time:   this.local_time.fixed(3),
+            seq:    this.input_seq
+          })
+
+          // modify the coordinate values ready for socket transport to server.
+          var input = String(inpt.x).replace('.', ',') + ':' + String(inpt.z).replace('.', ',')
+
+          // Send the packet of information to the server.
+          // The input packets are labelled with an 'i' in front.
+          var server_packet = 'i.'
+          server_packet += input + '.'
+          server_packet += this.local_time.toFixed(3).replace('.', '-') + '.'
+          server_packet += this.input_seq
+
+          this.socket.send(server_packet)
+
+          // Return the direction if needed
+          return this.physics_movement_vector_from_direction(x_dir, y_dir, z_dir)
+
+        } else {
+          return { x:0, y:0, z:0 }
         }
       }
 

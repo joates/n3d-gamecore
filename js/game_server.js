@@ -17,6 +17,8 @@
    *  MIT Licensed.
    */
 
+    var n3d_state = false
+
 
     var game_server = module.exports = { games: {}, game_count: 0 }
       , uuid        = require('node-uuid')
@@ -127,7 +129,13 @@
         // the client should be in a game, so
         // we can tell that game to handle the input
         if (client && client.game && client.game.gamecore) {
-          client.game.gamecore.handle_server_input(client, input_commands, input_time, input_seq)
+
+          // issue #2
+          if (n3d_state) {
+            client.game.gamecore.n3d_handle_server_input(client, input_commands, input_time, input_seq)
+          } else {
+            client.game.gamecore.handle_server_input(client, input_commands, input_time, input_seq)
+          }
         }
       }
 
