@@ -143,36 +143,36 @@
           // scale down
           n3d_players[id].position.multiplyScalar(scale)
         }
-
-        if (id == uuid) {
-          // camera follows our player.
-
-          camera.updateMatrixWorld()
-          var relativeCameraOffset = new THREE.Vector3(0, 20, 60)
-
-          var cameraOffset = relativeCameraOffset.applyMatrix4(n3d_players[uuid].matrixWorld)
-
-          camera.position.copy(cameraOffset)
-          camera.lookAt(n3d_players[uuid].position)
-
-          // TODO:
-          //update_player_heading(uuid)
-
-          // process controller coordinates
-          cX = controller.deltaX() * 0.016
-          cZ = controller.deltaY() * 0.016
-
-          // ignore smaller controller movements,
-          // and avoid the additional calculations that follow..
-          if ((cX > -0.1 && cX < 0.1) && (cZ > -0.1 && cZ < 0.1)) return
-
-          // clamp the values (i.e. max velocity)
-          cX = Math.min(Math.max(cX, -3), 3)
-          cZ = Math.min(Math.max(cZ, -3), 3)
-
-          return { x:cX, y:0, z:cZ }
-        }
       }
+    }
+
+    if (n3d_players[uuid]) {
+      // camera follows our player.
+
+      camera.updateMatrixWorld()
+      var relativeCameraOffset = new THREE.Vector3(0, 20, 60)
+
+      var cameraOffset = relativeCameraOffset.applyMatrix4(n3d_players[uuid].matrixWorld)
+
+      camera.position.copy(cameraOffset)
+      camera.lookAt(n3d_players[uuid].position)
+
+      // TODO:
+      //update_player_heading(uuid)
+
+      // process controller coordinates
+      cX = controller.deltaX() * 0.016
+      cZ = controller.deltaY() * 0.016
+
+      // ignore smaller controller movements,
+      // and avoid the additional calculations that follow..
+      if ((cX > -0.1 && cX < 0.1) && (cZ > -0.1 && cZ < 0.1)) return
+
+      // clamp the values (i.e. max velocity)
+      cX = Math.min(Math.max(cX, -3), 3)
+      cZ = Math.min(Math.max(cZ, -3), 3)
+
+      return { x:cX, y:0, z:cZ }
     }
   }
 

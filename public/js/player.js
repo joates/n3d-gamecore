@@ -11,7 +11,7 @@
     // Store the instance, if any
     this.instance = player_instance
     this.game = game_instance
-    this.index = game_instance.playercount || 1
+    this.index = Math.random() < 0.5 ? 0 : 1
 
     // Set up initial values for our state information
     this.pos = { x:0, y:0, z:0 }

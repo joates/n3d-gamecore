@@ -17,7 +17,7 @@
    *  MIT Licensed.
    */
 
-  var n3d_state = false
+  var n3d_state = true
 
   //  The main update loop runs on requestAnimationFrame,
   //  Which falls back to a setTimeout loop on the server
@@ -1112,7 +1112,8 @@
         // need player to exist so we can apply the update.
         this.player_set[id] = new game_player(this)
         this.player_set[id].state = this.player_set[id].index ? 'orange' : 'yellow'
-        n3d_scene_add_mesh(this.player_set[id], this.player_set[id].index)
+        this.player_set[id].color = this.player_set[id].index ? '#EE9000' : '#EEEE00'
+        n3d_scene_add_mesh(this.player_set[id], id)
         console.log("created player: " + id)
       }
 
@@ -1432,7 +1433,7 @@
             }
           }
 
-          this.player_self = this.player_set[latest_server_data.uuid]
+          //this.player_self = this.player_set[latest_server_data.uuid]
 
           // Now, if not predicting client movement, we will maintain the local player position
           // using the same method, smoothing the players information from the past.

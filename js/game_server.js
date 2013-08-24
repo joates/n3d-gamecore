@@ -17,7 +17,7 @@
    *  MIT Licensed.
    */
 
-    var n3d_state = false
+    var n3d_state = true
 
 
     var game_server = module.exports = { games: {}, game_count: 0 }
