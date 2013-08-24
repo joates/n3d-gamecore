@@ -171,7 +171,10 @@
         this.lastframetime = t
 
         // Update the game specifics
-        this.client_update()
+
+        // issue #2
+        //this.client_update()
+        this.n3d_client_update()
 
         // schedule the next update
         this.updateid = window.requestAnimationFrame(this.update.bind(this), this.viewport)
@@ -659,7 +662,10 @@
         else this.scene.style.visibility = 'visible'
 
         // Update & Render the 3D scene.
-        var input_coords = scene_update(this.allplayers)
+        //var input_coords = scene_update(this.allplayers)
+
+        // issue #2
+        var input_coords = n3d_scene_update(this.player_set, this.player_self.uuid)
         scene_render()
 
         // 2D viewport (player map)
@@ -1027,7 +1033,7 @@
         // Sent when we are disconnected (network, server down, etc)
         this.socket.on('disconnect', this.client_ondisconnect.bind(this))
         // Sent each tick of the server simulation. This is our authoritive update
-        this.socket.on('onserverupdate', this.client_onserverupdate_recieved.bind(this))
+        //this.socket.on('onserverupdate', this.client_onserverupdate_recieved.bind(this))
 
         // issue #2
         this.socket.on('on_server_update', this.n3d_onserverupdate_received.bind(this))
@@ -1100,7 +1106,7 @@
         // need player to exist so we can apply the update.
         this.player_set[id] = new game_player(this)
         this.player_set[id].state = this.player_set[id].index ? 'orange' : 'yellow'
-        scene_add_mesh(this.player_set[id], this.player_set[id].index)
+        n3d_scene_add_mesh(this.player_set[id], this.player_set[id].index)
         console.log("created player: " + id)
       }
 
@@ -1256,5 +1262,72 @@
 
         // give it back
         return resulting_vector
+      }
+
+  //
+
+      game_core.prototype.n3d_client_update = function() {
+
+        // 2D Viewport visibility.
+        if (! this.show_2D) this.viewport.style.visibility = 'hidden'
+        else this.viewport.style.visibility = 'visible'
+
+        // 3D Viewport visibility.
+        if (! this.show_3D) this.scene.style.visibility = 'hidden'
+        else this.scene.style.visibility = 'visible'
+
+        // Update & Render the 3D scene.
+        //var input_coords = scene_update(this.allplayers)
+
+        // issue #2
+        var input_coords = n3d_scene_update(this.player_set, this.player_self.uuid)
+        scene_render()
+
+        // 2D viewport (player map)
+        this.ctx.clearRect(0, 0, this.viewport.width, this.viewport.height)
+
+        // draw help/information if required
+        this.client_draw_info()
+
+        // Capture inputs from the player
+        this.client_handle_input(input_coords)
+
+        // Network player just gets drawn normally, with interpolation from
+        // the server updates, smoothing out the positions from the past.
+        // Note that if we don't have prediction enabled - this will also
+        // update the actual local client position on screen as well.
+        if (! this.naive_approach) {
+          this.n3d_client_process_net_updates()
+        }
+
+        // When we are doing client side prediction, we smooth out our position
+        // across frames using local input states we have stored.
+        this.n3d_client_update_local_position()
+
+        // need the client players position to use when calculating map view.
+        var map_offset_pos = this.player_self.pos
+
+        for (var id in this.player_set) {
+
+          if (this.player_self.uuid != id) {
+            // only showing _other_ players on the 2d map !!
+
+            // Now they should have updated, we can draw the entities themselves
+            this.player_set[id].draw(map_offset_pos)
+
+            // and these
+            if (this.show_dest_pos && !this.naive_approach) {
+              this.player_set[id].drawdestghost(map_offset_pos)
+            }
+
+            // and lastly draw these
+            if (this.show_server_pos && ! this.naive_approach) {
+              this.player_set[id].drawserverghost(map_offset_pos)
+            }
+          }
+        }
+    
+        // Work out the fps average
+        this.client_refresh_fps()
       }
 
