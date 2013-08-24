@@ -1202,6 +1202,23 @@
   //
 
       game_core.prototype.n3d_update_local_position = function() {
+        if (this.client_predict) {
+
+          // Work out the time we have since we updated the state
+          var t = (this.local_time - this.player_self.state_time) / this._pdt
+
+          // Then store the states for clarity,
+          var old_state = this.player_self.old_state.pos
+          var current_state = this.player_self.cur_state.pos
+
+          // Make sure the visual position matches the states we have stored
+          //this.player_self.pos = this.v_add(old_state, this.v_mul_scalar(this.v_sub(current_state,old_state), t))
+          this.player_self.pos = current_state
+
+          // TODO: collisions are ignored for now!
+          //We handle collision on client if predicting.
+          //this.check_collision( this.player_self )
+        }
       }
 
   //
