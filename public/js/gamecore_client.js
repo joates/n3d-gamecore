@@ -1297,7 +1297,7 @@
         // Note that if we don't have prediction enabled - this will also
         // update the actual local client position on screen as well.
         if (! this.naive_approach) {
-          this.n3d_client_process_net_updates()
+          this.n3d_process_net_updates()
         }
 
         // When we are doing client side prediction, we smooth out our position
@@ -1329,5 +1329,124 @@
     
         // Work out the fps average
         this.client_refresh_fps()
+      }
+
+  //
+
+      game_core.prototype.n3d_process_net_updates = function() {
+
+        // No updates...
+        if (! this.server_updates.length) return
+
+        // First:
+        // Find the position in the updates, on the timeline
+        // We call this current_time, then we find the past_pos
+        // and the target_pos using this, searching throught the
+        // server_updates array for current_time in between 2 other times.
+        // Then:
+        // other player position = lerp(past_pos, target_pos, current_time)
+
+        // Find the position in the timeline of updates we stored.
+        var current_time = this.client_time
+        var count = this.server_updates.length - 1
+        var target = null
+        var previous = null
+
+        // We look from the 'oldest' updates, since the newest ones are at the
+        // end (list.length-1 for example). This will be expensive only when
+        // our time is not found on the timeline, since it will run all samples.
+        // Usually this iterates very little before breaking out with a target.
+        for (var i=0; i<count; ++i) {
+
+          var point = this.server_updates[i]
+          var next_point = this.server_updates[i + 1]
+
+          // Compare our point in time with the server times we have
+          if (current_time > point.t && current_time < next_point.t) {
+            target = next_point
+            previous = point
+            break
+          }
+        }
+
+        // With no target we store the last known
+        // server position and move to that instead
+        if (! target) {
+          target = this.server_updates[0]
+          previous = this.server_updates[0]
+        }
+
+        // Now that we have a target and a previous destination,
+        // We can interpolate between them based on 'how far in between' we are.
+        // This is simple percentage maths, value/target = [0,1] range of numbers.
+        // lerp requires the 0,1 value to lerp to? thats the one.
+
+        if (target && previous) {
+
+          this.target_time = target.t
+
+          var difference = this.target_time - current_time
+          var max_difference = (target.t - previous.t).fixed(3)
+          var time_point = (difference / max_difference).fixed(3)
+
+          // Because we use the same target and previous in extreme cases
+          // It is possible to get incorrect values due to division by 0 difference
+          // and such. This is a safe guard and should probably not be here. lol.
+          if (isNaN(time_point)) time_point = 0
+          if (time_point == -Infinity) time_point = 0
+          if (time_point == Infinity) time_point = 0
+
+          // The most recent server update
+          var latest_server_data = this.server_updates[this.server_updates.length - 1]
+
+          for (var id in latest_server_data.vals) {
+
+            // These are the exact server positions from this tick, but only for the ghost
+            var other_server_pos = (latest_server_data.vals[id]) ? latest_server_data.vals[id].pos : 0
+
+            // The other players positions in this timeline, behind us and in front of us
+            var other_target_pos = (target.vals[id]) ? this.pos(target.vals[id].pos) : 0
+            var other_past_pos = (previous.vals[id]) ? this.pos(previous.vals[id].pos) : other_target_pos  //set to target if this guy is new
+
+            if (this.player_set[id]) {
+              // update the dest block, this is a simple lerp
+              // to the target from the previous point in the server_updates buffer
+              this.player_set[id].ghostpos = this.pos(other_server_pos)
+              this.player_set[id].destpos  = this.v_lerp(other_past_pos, other_target_pos, time_point)
+
+              // apply smoothing from current pos to the new destination pos
+              if (this.client_smoothing) {
+                this.player_set[id].pos = this.v_lerp(this.player_set[id].pos, this.player_set[id].destpos, this._pdt * this.client_smooth)
+              } else {
+                this.player_set[id].pos = this.pos(this.player_set[id].destpos)
+              }
+            }
+          }
+
+          this.player_self = this.player_set[latest_server_data.uuid]
+
+          // Now, if not predicting client movement, we will maintain the local player position
+          // using the same method, smoothing the players information from the past.
+          if (! this.client_predict && ! this.naive_approach) {
+
+            // These are the exact server positions from this tick, but only for the ghost
+            var my_server_pos = latest_server_data.vals[latest_server_data.uuid].pos
+
+            // The other players positions in this timeline, behind us and in front of us
+            var my_target_pos = target.vals[target.uuid].pos
+            var my_past_pos = previous.vals[previous.uuid].pos
+
+            // Snap the ghost to the new server position
+            this.player_self.ghostpos = this.pos(my_server_pos)
+            var local_target = this.v_lerp(my_past_pos, my_target_pos, time_point)
+
+            // Smoothly follow the destination position
+            if (this.client_smoothing) {
+              this.player_self.pos = this.v_lerp(this.player_self.pos, local_target, this._pdt * this.client_smooth)
+            } else {
+              this.player_self.pos = this.pos(local_target)
+            }
+          }
+        }
       }
 
