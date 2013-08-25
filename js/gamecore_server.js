@@ -17,6 +17,8 @@
    *  MIT Licensed.
    */
 
+  var n3d_state = true
+
 
   //  The main update loop runs on requestAnimationFrame,
   //  Which falls back to a setTimeout loop on the server
@@ -335,6 +337,7 @@
         for (var id in this.player_manifest) {
           packet[id] = {
             pos: this.player_manifest[id].pos,
+            idx: this.player_manifest[id].index,
             isq: this.player_manifest[id].last_input_seq || 0
           }
         }
@@ -413,7 +416,7 @@
         this.playercount++
         var p = new game_player(this, player)
         this.allplayers.push(p)
-        this.allplayers[this.allplayers.length - 1].index = this.playercount
+        if (! n3d_state) this.allplayers[this.allplayers.length - 1].index = this.playercount
 
         // issue #2
         this.player_manifest[player.uuid] = p

@@ -189,6 +189,13 @@
 
   //
 
+  function n3d_scene_remove_mesh(id) {
+    scene.remove(n3d_players[id])
+    delete n3d_players[id]
+  }
+
+  //
+
   function scene_render() {
     renderer.render(scene, camera)
   }

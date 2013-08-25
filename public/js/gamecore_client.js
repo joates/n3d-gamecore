@@ -1108,9 +1108,11 @@
   //
 
       // issue #2
-      game_core.prototype.n3d_add_player = function(id) {
+      game_core.prototype.n3d_add_player = function(id, pos, idx) {
         // need player to exist so we can apply the update.
         this.player_set[id] = new game_player(this)
+        this.player_set[id].pos   = this.player_set[id].cur_state = pos
+        this.player_set[id].index = parseInt(idx)
         this.player_set[id].state = this.player_set[id].index ? 'orange' : 'yellow'
         this.player_set[id].color = this.player_set[id].index ? '#EE9000' : '#EEEE00'
         n3d_scene_add_mesh(this.player_set[id], id)
@@ -1128,7 +1130,12 @@
         for (var id in data.vals) {
 
           // player must exist before it can be updated.
-          if (this.player_set[id] == undefined) this.n3d_add_player(id)
+          if (this.player_set[id] == undefined) {
+            // create local player character (with pos & color).
+            this.n3d_add_player(id, data.vals[id].pos, data.vals[id].idx)
+            // player color is decided, we don't need this anymore.
+            delete data.vals[id].idx
+          }
 
           if (this.naive_approach) {
             this.player_set[id].pos = this.pos(data.vals[id].pos)
@@ -1152,6 +1159,15 @@
         if (this.player_self.pos == undefined) {
           this.player_self = this.player_set[data.uuid]
           this.player_self.uuid = data.uuid
+        }
+
+        // delete local players that don't exist in update
+        // because they are out-of-range (issue #3) or disconnected.
+        for (var id in this.player_set) {
+          if (data.vals[id] == undefined) {
+            n3d_scene_remove_mesh(id)
+            delete this.player_set[id]
+          }
         }
       }
 
