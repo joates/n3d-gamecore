@@ -419,10 +419,9 @@
         // spiral spawn location.
         var angle  = 0.5 * this.playercount
         var radius = 30 + 5 * this.playercount
-        p.pos.x = p.cur_state.pos.x = radius * Math.cos(angle)
-        p.pos.z = p.cur_state.pos.x = radius * Math.sin(angle)
-
-console.dir(p.pos)
+        p.pos.x = radius * Math.cos(angle)
+        p.pos.z = radius * Math.sin(angle)
+        p.cur_state.pos = this.pos(p.pos)
 
         this.allplayers.push(p)
         if (! n3d_state) this.allplayers[this.allplayers.length - 1].index = this.playercount

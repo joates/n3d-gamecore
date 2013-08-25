@@ -17,7 +17,8 @@
     this.pos = { x:0, y:0, z:0 }
     this.ghostpos = { x:0, y:0, z:0 }
     this.destpos  = { x:0, y:0, z:0 }
-    this.size = { x:16, y:16, z:16, hx:8, hy:8, hz:8 }
+    //this.size = { x:16, y:16, z:16, hx:8, hy:8, hz:8 }
+    this.size = { r:6, infoX:3, infoZ:3 }
     this.state = 'not-connected'
     this.color = 'rgba(240,240,240,0.8)'
     this.info_color = 'rgba(220,240,220,0.8)'
@@ -74,19 +75,34 @@
     game.ctx.fillStyle = this.color
 
     // Draw a rectangle for us
+    /**
     game.ctx.fillRect(
       ((this.pos.x - offset_pos.x) * map_scale) + half_map_width - this.size.hx,
       ((this.pos.z - offset_pos.z) * map_scale) + half_map_height - this.size.hz,
         this.size.x,
         this.size.z
     )
+    */
+
+    // Draw a filled circle
+    game.ctx.beginPath()
+    game.ctx.arc(
+      ((this.pos.x - offset_pos.x) * map_scale) + half_map_width - this.size.r,
+      ((this.pos.z - offset_pos.z) * map_scale) + half_map_height - this.size.r,
+        this.size.r,
+        0,
+        Math.PI * 2,
+        true
+    )
+    game.ctx.closePath()
+    game.ctx.fill()
 
     // Draw a status update
     game.ctx.fillStyle = this.info_color
     game.ctx.fillText(
         this.state,
-      ((this.pos.x - offset_pos.x) * map_scale) + half_map_width + 10,
-      ((this.pos.z - offset_pos.z) * map_scale) + half_map_height + 4
+      ((this.pos.x - offset_pos.x) * map_scale) + half_map_width + this.size.infoX,
+      ((this.pos.z - offset_pos.z) * map_scale) + half_map_height - this.size.infoZ
     )
   }
 
@@ -105,19 +121,35 @@
     game.ctx.fillStyle = 'rgba(255,255,255,0.2)'
 
     // Draw a rectangle for us
+    /**
     game.ctx.fillRect(
       ((this.ghostpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.hx,
       ((this.ghostpos.z - offset_pos.Z) * map_scale) + half_map_height - this.size.hz,
         this.size.x,
         this.size.z
     )
+    */
+
+    // Draw a filled circle
+    game.ctx.beginPath()
+    game.ctx.arc(
+      ((this.ghostpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.r,
+      ((this.ghostpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.r,
+        this.size.r,
+
+        0,
+        Math.PI * 2,
+        true
+    )
+    game.ctx.closePath()
+    game.ctx.fill()
 
     // Draw a status update
     game.ctx.fillStyle = this.info_color
     game.ctx.fillText(
-       'server_pos',
-      ((this.ghostpos.x - offset_pos.x) * map_scale) + half_map_width + 10,
-      ((this.ghostpos.z - offset_pos.z) * map_scale) + half_map_height + 4
+        this.state,
+      ((this.ghostpos.x - offset_pos.x) * map_scale) + half_map_width + this.size.infoX,
+      ((this.ghostpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.infoZ
     )
   }
 
@@ -136,20 +168,34 @@
     game.ctx.fillStyle = 'rgba(255,255,255,0.1)'
 
     // Draw a rectangle for us
+    /**
     game.ctx.fillRect(
       ((this.destpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.hx,
       ((this.destpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.hz,
         this.size.x,
         this.size.z
     )
+    */
 
+    // Draw a filled circle
+    game.ctx.beginPath()
+    game.ctx.arc(
+      ((this.destpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.r,
+      ((this.destpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.r,
+        this.size.r,
+        0,
+        Math.PI * 2,
+        true
+    )
+    game.ctx.closePath()
+    game.ctx.fill()
 
     // Draw a status update
     game.ctx.fillStyle = this.info_color
     game.ctx.fillText(
-       'dest_pos',
-      ((this.destpos.x - offset_pos.x) * map_scale) + half_map_width + 10,
-      ((this.destpos.z - offset_pos.z) * map_scale) + half_map_height + 4
+        this.state,
+      ((this.destpos.x - offset_pos.x) * map_scale) + half_map_width + this.size.infoX,
+      ((this.destpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.infoZ
     )
   }
 

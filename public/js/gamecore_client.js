@@ -1113,7 +1113,7 @@
         this.player_set[id] = new game_player(this)
         this.player_set[id].pos   = this.player_set[id].cur_state = pos
         this.player_set[id].index = parseInt(idx)
-        this.player_set[id].state = this.player_set[id].index ? 'orange' : 'yellow'
+        this.player_set[id].state = this.player_set[id].index ? 'orange' : 'lemon'
         this.player_set[id].color = this.player_set[id].index ? '#EE9000' : '#EEEE00'
         n3d_scene_add_mesh(this.player_set[id], id)
         console.log("created player: " + id)
