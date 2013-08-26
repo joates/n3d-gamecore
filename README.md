@@ -1,4 +1,4 @@
-## n3d-gamecore (0.0.1-alpha)
+## n3d-gamecore (0.0.2-alpha)
 
 the codebase is considered **ALPHA quality** only, should be OK to use but is 'unstable' because the API will probably change without notice. If you pull updates from 'dev' branch and it breaks your code, its on you, *that* is your warning. _Use at own risk_.
 
