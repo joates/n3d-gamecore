@@ -17,9 +17,6 @@
    *  MIT Licensed.
    */
 
-  var n3d_state = true
-
-
   //  The main update loop runs on requestAnimationFrame,
   //  Which falls back to a setTimeout loop on the server
   //  Code below is from Three.js, and sourced from links below
@@ -71,24 +68,11 @@
         //Store a flag if we are the server
         this.server = this.instance !== undefined
 
-        // TODO: collision not implemented yet !
-        // Used in collision etc.
-        /**
-        this.world = {
-            width:  800,
-            height: 800,
-            depth:  800
-        }
-        */
+        // TODO: collisions are not implemented yet !
+        //this.world = { width:800, height:800, depth:800 }
 
-        // issue #2
+        // Full stack of the connected clients/players.
         this.player_manifest = {}
-
-        //this.allplayers = []
-
-        // issue #2
-        //this.allplayers.push(new game_player(this, this.instance.player_host))
-        //this.allplayers[0].idingame = this.playercount
 
         // The speed at which the clients move.
         this.playerspeed = 120
@@ -270,38 +254,7 @@
 
   //
 
-      // TODO: DEPRECATED !!
-      /**
       game_core.prototype.update_physics = function() {
-        this.server_update_physics()
-      }
-      */
-
-  //
-
-      // TODO: DEPRECATED !!
-      /**
-      game_core.prototype.server_update_physics = function() {
-
-        for (var i=0, l=this.allplayers.length; i<l; i++) {
-          // handle players
-          this.allplayers[i].old_state.pos = this.pos(this.allplayers[i].pos)
-          var new_dir = this.process_input(this.allplayers[i])
-          this.allplayers[i].pos = this.v_add(this.allplayers[i].old_state.pos, new_dir)
-
-          // TODO: collisions are ignored for now !
-          // Keep the physics position in the world
-          //this.check_collision(this.allplayers[i])
-
-          // clear buffer
-          this.allplayers[i].inputs = []
-        }
-      }
-      */
-
-  //
-
-      game_core.prototype.n3d_update_physics = function() {
 
         for (var id in this.player_manifest) {
           // handle players
@@ -325,40 +278,13 @@
         // Update the state of our local clock to match the timer
         this.server_time = this.local_time
 
-        // TODO: DEPRECATED !!
-        /**
-        // Make a snapshot of the current state, for updating the clients
-        var allpos = []
-
-        for (var i=0, l=this.allplayers.length; i<l; i++) {  // concat all clients pos from our players array
-          //console.log(i + ': ', this.allplayers[i].last_input_seq)
-          var vals = { pos: this.allplayers[i].pos, isq: this.allplayers[i].last_input_seq }
-          allpos[this.allplayers[i].index] = vals
-        }
-
-        this.laststate = {
-          vals:  allpos,                // all positions and inpseq
-          t:    this.server_time        // our current local time on the server
-        }
-
-        for (var i=0, l=this.allplayers.length; i<l; i++) {
-          // this users array index to be sent too. (for parsing data accordingly)
-          this.laststate.myi = this.allplayers[i].index
-          // Send the snapshot to the player
-          if (this.allplayers[i].instance) {
-            this.allplayers[i].instance.emit('onserverupdate', this.laststate)
-          }
-        }
-        */
-
-        // issue #2
+        // prepare and send updates.
         var packet = this.server_prepare_update()
         this.server_transmit_update(packet)
       }
 
   //
 
-      // issue #2
       game_core.prototype.server_prepare_update = function() {
         var packet = {}
 
@@ -375,7 +301,6 @@
 
   //
 
-      // issue #2
       game_core.prototype.server_transmit_update = function(packet) {
         this.last_state = {
           vals: packet,
@@ -389,36 +314,6 @@
           }
         }
       }
-
-  //
-
-      // TODO: DEPRECATED !!
-      /**
-      game_core.prototype.handle_server_input = function(client, input, input_time, input_seq) {
-
-        // Fetch which client this refers
-        var player_client = null
-        for (var i=0, l=this.allplayers.length; i<l; i++) {
-          if (client.uuid == this.allplayers[i].instance.uuid) {
-            player_client = this.allplayers[i]
-            break
-          }
-        }
-
-        if (player_client && player_client.inputs) {
-          if (input.length) {
-            // convert string input values back into numeric data
-            for (var i=0, l=input.length; i<l; i++) {
-              //input[i] = parseInt(input[i].replace(',', '.'))
-              input[i] = parseFloat(input[i].replace(',', '.'))
-            }
-
-            // Store the input on the player instance for processing in the physics loop
-            player_client.inputs.push({ inputs: input, time: input_time, seq: input_seq })
-          }
-        }
-      }
-      */
 
   //
 
@@ -436,11 +331,7 @@
         setInterval(function() {
           this._pdt = (new Date().getTime() - this._pdte) / 1000.0
           this._pdte = new Date().getTime()
-
-          // issue #2
-          //this.update_physics()
-          this.n3d_update_physics()
-
+          this.update_physics()
         }.bind(this), 15)
       }
 
@@ -458,32 +349,14 @@
         p.pos.z = radius * Math.sin(angle)
         p.cur_state.pos = this.pos(p.pos)
 
-        //this.allplayers.push(p)
-        //if (! n3d_state) this.allplayers[this.allplayers.length - 1].index = this.playercount
-
-        // issue #2
+        // add new player to storage.
         this.player_manifest[player.uuid] = p
-        //console.dir(this.player_manifest)
       }
 
   //
 
       game_core.prototype.player_disconnect = function(uuid) {
         // someone quit the game, delete them from our list !
-
-        // TODO: DEPRECATED !!
-        /**
-        for (var i = this.allplayers.length - 1; i>=0; i--) {
-          //console.log(i+"# "+this.allplayers[i].instance.uuid)
-          if (this.allplayers[i].instance.uuid == uuid) {
-            this.allplayers.splice(i, 1)
-            break
-          }
-          this.allplayers.filter(function(a) { return typeof a !== 'undefined' })
-        }
-        */
-
-        // issue #2
         delete this.player_manifest[uuid]
       }
 
@@ -497,7 +370,6 @@
           if (input.length) {
             // convert string input values back into numeric data
             for (var i=0, l=input.length; i<l; i++) {
-              //input[i] = parseInt(input[i].replace(',', '.'))
               input[i] = parseFloat(input[i].replace(',', '.'))
             }
 
