@@ -15,12 +15,9 @@
     , camera, scene, renderer
     , WIDTH, HEIGHT
     , scale   = 0.2
-    , players = []
+    , players = {}
     , controller
     , golden_ratio = 1.6180339887
-
-  // issue #2
-  var n3d_players = {}
 
   //
 
@@ -32,7 +29,7 @@
 
     controller = new Controller({ mouseSupport: false, strokeStyle: '#FFFF00' })
 
-    camera = new THREE.PerspectiveCamera(40, WIDTH/HEIGHT, 0.1, 10000)
+    camera = new THREE.PerspectiveCamera(40, WIDTH / HEIGHT, 0.1, 10000)
     camera.position.set(0, 20, 60)
     camera.lookAt(scene.position)
 
@@ -49,31 +46,28 @@
     })
     planeGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
     planeGeometry.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI / 4))
-    planeGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.2, 0))
+    planeGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.4, 0))
     var plane = new THREE.Mesh( planeGeometry, planeMaterial )
-    //plane.translateY(-1.2)
-    //scene.add( plane )
 
     // tile grid.
     var gridGeometry = new THREE.PlaneGeometry( 1000, 1000, 15, 15 )
     var gridMaterial = new THREE.MeshBasicMaterial({
       color: 0x202020, wireframe: true, wireframeLinewidth: 2.0
     })
-    gridGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) )
-    gridGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( - Math.PI / 4 ) )
+    gridGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+    gridGeometry.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI / 4))
+    gridGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.2, 0))
     var grid = new THREE.Mesh( gridGeometry, gridMaterial )
-    grid.translateY(-1.0)
 
-    // merge into a single object.
+    // merge plane & grid into a single object.
     var floor = new THREE.Object3D()
     floor.add(plane)
     floor.add(grid)
-    scene.add( floor )
+    scene.add(floor)
 
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(WIDTH, HEIGHT)
     renderer.autoClear = true
-    //renderer.setClearColor(0x000000, 1)
 
     container = document.getElementById('container')
     container.appendChild(renderer.domElement)
@@ -84,80 +78,31 @@
 
   //
 
-  function scene_update(allplayers) {
-    var myi = 0
-
-    for (var i=0, l=players.length; i<l; i++) {
-      if (players[i] != undefined && players[i] instanceof THREE.Mesh) {
-
-        if (allplayers[i].myi) myi = allplayers[i].myi
-
-        if (allplayers[i] && ! isNaN(allplayers[i].pos.x)) {
-          players[i].position.copy(allplayers[i].pos)
-          // scale down
-          players[i].position.multiplyScalar(scale)
-        }
-      }
-    }
-
-    if (myi > 0) {
-      // camera follows our player.
-
-      camera.updateMatrixWorld()
-      var relativeCameraOffset = new THREE.Vector3(0, 20, 60)
-
-      var cameraOffset = relativeCameraOffset.applyMatrix4(players[myi].matrixWorld)
-
-      camera.position.copy(cameraOffset)
-      camera.lookAt(players[myi].position)
-
-      // TODO:
-      //update_player_heading(myi)
-
-      // process controller coordinates
-      cX = controller.deltaX() * 0.016
-      cZ = controller.deltaY() * 0.016
-
-      // ignore smaller controller movements,
-      // and avoid the additional calculations that follow..
-      if ((cX > -0.1 && cX < 0.1) && (cZ > -0.1 && cZ < 0.1)) return
-
-      // clamp the values (i.e. max velocity)
-      cX = Math.min(Math.max(cX, -3), 3)
-      cZ = Math.min(Math.max(cZ, -3), 3)
-
-      return { x:cX, y:0, z:cZ }
-    }
-  }
-
-  //
-
-  // issue #2
-  function n3d_scene_update(player_set, uuid) {
+  function scene_update(player_set, uuid) {
 
     for (var id in player_set) {
-      if (n3d_players[id] != undefined && n3d_players[id] instanceof THREE.Mesh) {
+      if (players[id] != undefined && players[id] instanceof THREE.Mesh) {
 
         if (player_set[id] && ! isNaN(player_set[id].pos.x)) {
-          n3d_players[id].position.copy(player_set[id].pos)
+          players[id].position.copy(player_set[id].pos)
           // scale down
-          n3d_players[id].position.multiplyScalar(scale)
+          players[id].position.multiplyScalar(scale)
         }
       }
     }
 
-    if (n3d_players[uuid]) {
+    if (players[uuid]) {
       // self color changed ?
-      n3d_players[uuid].material.color = new THREE.Color(player_set[uuid].color)
+      players[uuid].material.color = new THREE.Color(player_set[uuid].color)
 
       // camera follows our player.
       camera.updateMatrixWorld()
       var relativeCameraOffset = new THREE.Vector3(0, 20, 60)
 
-      var cameraOffset = relativeCameraOffset.applyMatrix4(n3d_players[uuid].matrixWorld)
+      var cameraOffset = relativeCameraOffset.applyMatrix4(players[uuid].matrixWorld)
 
       camera.position.copy(cameraOffset)
-      camera.lookAt(n3d_players[uuid].position)
+      camera.lookAt(players[uuid].position)
 
       // TODO:
       //update_player_heading(uuid)
@@ -180,57 +125,31 @@
 
   //
 
-  // issue #2
-  function n3d_scene_add_mesh(p, id) {
-    var g = new THREE.CylinderGeometry( 2.6, 3, 2.2, 32, 32, false )
-    var m = new THREE.MeshLambertMaterial({ color: p.color })
-    n3d_players[id] = new THREE.Mesh( g, m )
-    n3d_players[id].position.copy(p.pos)
-    if (scene != undefined) scene.add(n3d_players[id])
-  }
-
-  //
-
-  function n3d_scene_remove_mesh(id) {
-    scene.remove(n3d_players[id])
-    delete n3d_players[id]
-  }
-
-  //
-
   function scene_render() {
     renderer.render(scene, camera)
   }
 
   //
 
-  function scene_add_mesh(p, idx) {
+  function scene_add_mesh(p, id) {
     var g = new THREE.CylinderGeometry( 2.6, 3, 2.2, 32, 32, false )
     var m = new THREE.MeshLambertMaterial({ color: p.color })
-    players[idx] = new THREE.Mesh( g, m )
-    players[idx].position.copy(p.pos)
-    scene.add(players[idx])
+    players[id] = new THREE.Mesh( g, m )
+    players[id].position.copy(p.pos)
+    if (scene != undefined) scene.add(players[id])
   }
 
   //
 
-  function scene_remove_mesh(idx) {
-    scene.remove(players[idx])
-    players[idx] = undefined
+  function scene_remove_mesh(id) {
+    scene.remove(players[id])
+    delete players[id]
   }
 
   //
 
-  function scene_update_player_color(idx, color) {
-    if (players[idx] != undefined && players[idx] instanceof THREE.Mesh) {
-      players[idx].material.color = new THREE.Color(color)
-    }
-  }
-
-  //
-
-  function update_player_heading(idx) {
-    var q = playerCube.quaternion
+  function update_player_heading(id) {
+    var q = players[id].quaternion
     var pVec = new THREE.Vector3(1, 0, 0).applyQuaternion(q)
 
     heading = Math.atan2(pVec.z, pVec.x)
@@ -239,7 +158,7 @@
     heading = Math.floor(heading % 360)
     //heading = "Heading: " + heading + '&deg;'
     //document.getElementById("heading").innerHTML = heading
-    allplayers[idx].heading = heading
+    players[id].heading = heading
   }
 
   //

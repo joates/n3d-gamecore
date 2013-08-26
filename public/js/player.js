@@ -32,7 +32,7 @@
     this.inputs = []
 
     // The world bounds we are confined to
-    // TODO: collisions are not defined yet !!
+    // TODO: collisions are not implemented yet !!
     /**
     this.pos_limits = {
       x_min: this.size.hx,
@@ -77,7 +77,7 @@
     game.ctx.closePath()
     game.ctx.fill()
 
-    if (opts.player || (opts.lerp === undefined && opts.ghost === undefined)) {
+    if (opts.player || ! (opts.lerp && opts.ghost)) {
       // Draw a status update
       game.ctx.fillStyle = this.info_color
       game.ctx.fillText(
@@ -110,7 +110,7 @@
 
   //
 
-  // server side we set the 'game_core' class to a global type,
+  // server side we set the 'game_player' class to a global type,
   // so that it can use it anywhere.
   if ('undefined' != typeof global) {
     module.exports = global.game_player = game_player

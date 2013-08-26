@@ -932,6 +932,10 @@
   //
 
       game_core.prototype.client_on_otherclientcolorchange = function(data) {
+
+        // TODO: DEPRECATED !!
+
+        /**
         var commands = data.split(',')
         if (this.allplayers[commands[0]]) {
           // players color on 2D map.
@@ -939,6 +943,8 @@
           // players color in 3D scene.
           scene_update_player_color(commands[0], commands[1])
         }
+        */
+
       }
 
   //
@@ -976,8 +982,9 @@
               case 'p' : //server ping
                 this.client_onping(commanddata); break
 
-              case 'c' : //other player changed colors
-                this.client_on_otherclientcolorchange(commanddata); break
+              // TODO: Not used !!
+              //case 'c' : //other player changed colors
+              //  this.client_on_otherclientcolorchange(commanddata); break
             }
 
           break
@@ -1113,7 +1120,7 @@
         }
 
         // add player mesh into 3d scene.
-        n3d_scene_add_mesh(this.player_set[id], id)
+        scene_add_mesh(this.player_set[id], id)
         console.log("created player: " + id)
       }
 
@@ -1171,7 +1178,7 @@
         // because they are out-of-range (issue #3) or disconnected.
         for (var id in this.player_set) {
           if (data.vals[id] == undefined) {
-            n3d_scene_remove_mesh(id)
+            scene_remove_mesh(id)
             delete this.player_set[id]
           }
         }
@@ -1311,7 +1318,7 @@
         else this.scene.style.visibility = 'visible'
 
         // Update & Render the 3D scene.
-        var input_coords = n3d_scene_update(this.player_set, this.player_self.uuid)
+        var input_coords = scene_update(this.player_set, this.player_self.uuid)
         scene_render()
 
         // 2D viewport (player map)
