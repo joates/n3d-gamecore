@@ -84,7 +84,7 @@
         // issue #2
         this.player_manifest = {}
 
-        this.allplayers = []
+        //this.allplayers = []
 
         // issue #2
         //this.allplayers.push(new game_player(this, this.instance.player_host))
@@ -270,12 +270,17 @@
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.update_physics = function() {
         this.server_update_physics()
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.server_update_physics = function() {
 
         for (var i=0, l=this.allplayers.length; i<l; i++) {
@@ -292,6 +297,26 @@
           this.allplayers[i].inputs = []
         }
       }
+      */
+
+  //
+
+      game_core.prototype.n3d_update_physics = function() {
+
+        for (var id in this.player_manifest) {
+          // handle players
+          this.player_manifest[id].old_state.pos = this.pos(this.player_manifest[id].pos)
+          var new_dir = this.process_input(this.player_manifest[id])
+          this.player_manifest[id].pos = this.v_add(this.player_manifest[id].old_state.pos, new_dir)
+
+          // TODO: collisions are not implemented !
+          // Keep the physics position in the world
+          //this.check_collision(this.player_manifest[id])
+
+          // clear buffer
+          this.player_manifest[id].inputs = []
+        }
+      }
 
   //
 
@@ -300,6 +325,8 @@
         // Update the state of our local clock to match the timer
         this.server_time = this.local_time
 
+        // TODO: DEPRECATED !!
+        /**
         // Make a snapshot of the current state, for updating the clients
         var allpos = []
 
@@ -322,6 +349,7 @@
             this.allplayers[i].instance.emit('onserverupdate', this.laststate)
           }
         }
+        */
 
         // issue #2
         var packet = this.server_prepare_update()
@@ -357,7 +385,7 @@
         for (var id in this.player_manifest) {
           this.last_state.uuid = id
           if (this.player_manifest[id].instance) {
-            this.player_manifest[id].instance.emit('on_server_update', this.last_state)
+            this.player_manifest[id].instance.emit('onserverupdate', this.last_state)
           }
         }
       }
@@ -408,7 +436,11 @@
         setInterval(function() {
           this._pdt = (new Date().getTime() - this._pdte) / 1000.0
           this._pdte = new Date().getTime()
-          this.update_physics()
+
+          // issue #2
+          //this.update_physics()
+          this.n3d_update_physics()
+
         }.bind(this), 15)
       }
 
@@ -426,8 +458,8 @@
         p.pos.z = radius * Math.sin(angle)
         p.cur_state.pos = this.pos(p.pos)
 
-        this.allplayers.push(p)
-        if (! n3d_state) this.allplayers[this.allplayers.length - 1].index = this.playercount
+        //this.allplayers.push(p)
+        //if (! n3d_state) this.allplayers[this.allplayers.length - 1].index = this.playercount
 
         // issue #2
         this.player_manifest[player.uuid] = p
@@ -439,6 +471,8 @@
       game_core.prototype.player_disconnect = function(uuid) {
         // someone quit the game, delete them from our list !
 
+        // TODO: DEPRECATED !!
+        /**
         for (var i = this.allplayers.length - 1; i>=0; i--) {
           //console.log(i+"# "+this.allplayers[i].instance.uuid)
           if (this.allplayers[i].instance.uuid == uuid) {
@@ -447,6 +481,7 @@
           }
           this.allplayers.filter(function(a) { return typeof a !== 'undefined' })
         }
+        */
 
         // issue #2
         delete this.player_manifest[uuid]

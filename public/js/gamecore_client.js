@@ -281,6 +281,8 @@
 
   //
 
+      // TODO: DEPRECATED !!!
+      /**
       game_core.prototype.update_physics = function() {
         if (n3d_state) {
           this.n3d_update_physics()
@@ -288,9 +290,12 @@
           this.client_update_physics()
         }
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!!
+      /**
       game_core.prototype.client_handle_input = function(inpt) {
 
         // This takes input from the client and keeps a record,
@@ -334,9 +339,12 @@
           return { x:0, y:0, z:0 }
         }
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_process_net_prediction_correction = function() {
 
         // No updates...
@@ -386,9 +394,12 @@
           }
         }
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_process_net_updates = function() {
 
         // No updates...
@@ -507,6 +518,7 @@
           }
         }
       }
+      */
 
   //
 
@@ -594,6 +606,8 @@
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_update_local_position = function() {
 
         if (this.client_predict) {
@@ -614,9 +628,12 @@
           //this.check_collision( this.selfplayer )
         }
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!!
+      /**
       game_core.prototype.client_update_physics = function() {
 
         // Fetch the new direction from the input buffer,
@@ -629,14 +646,14 @@
           this.selfplayer.state_time = this.local_time
         }
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!!
+      /**
       game_core.prototype.client_update = function() {
 
-        // TODO: DEPRECATED !!!
-
-        /**
         // 2D Viewport visibility.
         if (! this.show_2D) this.viewport.style.visibility = 'hidden'
         else this.viewport.style.visibility = 'visible'
@@ -695,9 +712,8 @@
     
         // Work out the fps average
         this.client_refresh_fps()
-        */
-
       }
+      */
 
   //
 
@@ -849,6 +865,8 @@
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_onreadygame = function(data) {
         var server_time = parseFloat(data.replace('-', '.'))
 
@@ -869,12 +887,13 @@
           }
         }
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_onjoingame = function(data) {
-
-        // TODO: is this function ever called ?
 
         //We are not the host
         this.selfplayer.host = false
@@ -885,12 +904,13 @@
         //Make sure the positions match servers and other clients
         this.client_reset_positions()
       }
+      */
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_onhostgame = function(data) {
-
-        // TODO: is this function ever called ?
 
         // The server sends the time when asking us to host, but it should be a new game.
         // so the value will be really small anyway (15 or 16ms)
@@ -909,30 +929,22 @@
         // Make sure we start in the correct place as the host.
         this.client_reset_positions()
       }
+      */
 
   //
 
       game_core.prototype.client_onconnected = function(data) {
 
-        // The server responded that we are now in a game,
-        // this lets us store the information about ourselves and set the colors
-        // to show we are now ready to be playing.
-
-        // issue #2
+        // The server responded with our unique identity.
         this.player_self.uuid = data.id
-
-        //this.player_self.info_color = '#cc0000'
-        //this.player_self.state = 'connected'
-        //this.player_self.online = true
       }
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_on_otherclientcolorchange = function(data) {
 
-        // TODO: DEPRECATED !!
-
-        /**
         var commands = data.split(',')
         if (this.allplayers[commands[0]]) {
           // players color on 2D map.
@@ -940,9 +952,8 @@
           // players color in 3D scene.
           scene_update_player_color(commands[0], commands[1])
         }
-        */
-
       }
+      */
 
   //
 
@@ -964,14 +975,16 @@
           case 's': //server message
 
             switch (subcommand) {
-              case 'h' : //host a game requested
-                this.client_onhostgame(commanddata); break
+              // TODO: Not used !!
+              //case 'h' : //host a game requested
+              //  this.client_onhostgame(commanddata); break
 
               case 'j' : //join a game requested
                 this.client_onjoingame(commanddata); break
 
-              case 'r' : //ready a game requested
-                this.client_onreadygame(commanddata); break
+              // TODO: Not used !!
+              //case 'r' : //ready a game requested
+              //  this.client_onreadygame(commanddata); break
 
               case 'e' : //end game requested
                 this.client_ondisconnect(commanddata); break
@@ -992,22 +1005,9 @@
 
       game_core.prototype.client_ondisconnect = function(data) {
 
-        // TODO: DEPRECATED !!
-
-        /**
-        // When we disconnect, we don't know if the other player is
-        // connected or not, and since we aren't, everything goes to offline
-
-        for(var i=0, l=this.allplayers.length; i<l; i++) {
-          this.allplayers[i].info_color = 'rgba(255,255,255,0.1)'
-          this.allplayers[i].state = 'not-connected'
-        }
-
-        this.selfplayer.info_color = 'rgba(255,255,255,0.1)'
-        this.selfplayer.state = 'not-connected'
-        this.selfplayer.online = false
-        */
-
+        // Any cleanup required when we disconnect.
+        this.player_self.info_color = 'rgba(255,255,255,0.2)'
+        this.player_self.state = 'not-connected'
       }
 
   //
@@ -1020,21 +1020,13 @@
         // When we connect, we are not 'connected' until we have a server id
         // and are placed in a game by the server. The server sends us a message for that.
         this.socket.on('connect', function() {
-          //this.selfplayer.state = 'connecting'
           this.player_self.state = 'connecting'
         }.bind(this))
 
         // Sent when we are disconnected (network, server down, etc)
         this.socket.on('disconnect', this.client_ondisconnect.bind(this))
-
-        // issue #2
-        if (n3d_state) {
-          this.socket.on('on_server_update', this.n3d_onserverupdate_received.bind(this))
-        } else {
-          // Sent each tick of the server simulation. This is our authoritive update
-          this.socket.on('onserverupdate', this.client_onserverupdate_received.bind(this))
-        }
-
+        // Sent each tick of the server simulation. This is our authoritive update
+        this.socket.on('onserverupdate', this.client_onserverupdate_received.bind(this))
         // Handle when we connect to the server, showing state and storing id's.
         this.socket.on('onconnected', this.client_onconnected.bind(this))
         // On error we just show that we are not connected for now. Can print the data.
@@ -1080,12 +1072,6 @@
           this.ctx.fillText(' This only applies to other clients when prediction is enabled, and applies to local player with no prediction.', 170 , 230)
         }
 
-        // Draw some information for the host
-        //if (this.selfplayer.host) {
-        //  this.ctx.fillStyle = 'rgba(255,255,255,0.7)'
-        //  this.ctx.fillText('You are the host', 10 , 465)
-        //}
-
         // Reset the style back to full white.
         this.ctx.fillStyle = 'rgba(255,255,255,1)'
       }
@@ -1124,7 +1110,7 @@
   //
 
       // issue #2
-      game_core.prototype.n3d_onserverupdate_received = function(data) {
+      game_core.prototype.client_onserverupdate_received = function(data) {
 
         this.server_time = data.t
         this.client_time = this.server_time - (this.net_offset / 1000)
@@ -1152,24 +1138,9 @@
 
             this.oldest_tick = this.server_updates[0].t
 
-            this.n3d_process_net_prediction_correction()
+            this.client_process_net_prediction_correction()
           }
         }
-
-        // make sure the player_self shortcut is valid.
-        // this should only happen once !! TODO: [Test]
-        /**
-        if (this.player_self.state === 'white') {
-          this.player_self = this.player_set[data.uuid]
-          this.player_self.uuid = data.uuid
-
-          // reset client player state from server update value.
-          this.player_self.index = parseInt(data.vals[data.uuid].idx)
-          this.player_self.state = this.player_self.index ? 'orange' : 'lemon'
-          this.player_self.color = this.player_self.index ? '#EE9000' : '#EEEE00'
-          this.player_self.color_2d = this.player_self.index ? '#EE9000' : '#EEEE00'
-        }
-        */
 
         // delete local players that don't exist in update
         // because they are out-of-range (issue #3) or disconnected.
@@ -1184,7 +1155,7 @@
   //
 
       // issue #2
-      game_core.prototype.n3d_process_net_prediction_correction = function() {
+      game_core.prototype.client_process_net_prediction_correction = function() {
 
         // No updates...
         if (! this.server_updates.length) return
@@ -1222,8 +1193,8 @@
             // Now we reapply all the inputs that we have locally that
             // the server hasn't yet confirmed. This will 'keep' our position the same,
             // but also confirm the server position at the same time.
-            this.n3d_update_physics()
-            this.n3d_update_local_position()
+            this.update_physics()
+            this.client_update_local_position()
           }
         }
       }
@@ -1231,7 +1202,7 @@
   //
 
       // issue #2
-      game_core.prototype.n3d_update_physics = function() {
+      game_core.prototype.update_physics = function() {
         if (this.client_predict) {
           this.player_self.old_state.pos = this.pos(this.player_self.cur_state.pos)
           var nd = this.n3d_process_input(this.player_self)
@@ -1243,7 +1214,7 @@
   //
 
       // issue #2
-      game_core.prototype.n3d_update_local_position = function() {
+      game_core.prototype.client_update_local_position = function() {
         if (this.client_predict) {
 
           // Work out the time we have since we updated the state
@@ -1325,19 +1296,19 @@
         this.client_draw_info()
 
         // Capture inputs from the player
-        this.n3d_handle_input(input_coords)
+        this.client_handle_input(input_coords)
 
         // Network player just gets drawn normally, with interpolation from
         // the server updates, smoothing out the positions from the past.
         // Note that if we don't have prediction enabled - this will also
         // update the actual local client position on screen as well.
         if (! this.naive_approach) {
-          this.n3d_process_net_updates()
+          this.client_process_net_updates()
         }
 
         // When we are doing client side prediction, we smooth out our position
         // across frames using local input states we have stored.
-        this.n3d_update_local_position()
+        this.client_update_local_position()
 
         // need the client players position to use when calculating map view.
         var map_offset_pos = this.player_self.pos
@@ -1372,7 +1343,7 @@
   //
 
       // issue #2
-      game_core.prototype.n3d_process_net_updates = function() {
+      game_core.prototype.client_process_net_updates = function() {
 
         // No updates...
         if (! this.server_updates.length) return
@@ -1492,7 +1463,7 @@
   //
 
       // issue #2
-      game_core.prototype.n3d_handle_input = function(inpt) {
+      game_core.prototype.client_handle_input = function(inpt) {
 
         // This takes input from the client and keeps a record,
         // It also sends the input information to the server immediately
