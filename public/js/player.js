@@ -17,10 +17,10 @@
     this.pos = { x:0, y:0, z:0 }
     this.ghostpos = { x:0, y:0, z:0 }
     this.destpos  = { x:0, y:0, z:0 }
-    //this.size = { x:16, y:16, z:16, hx:8, hy:8, hz:8 }
-    this.size = { r:6, infoX:3, infoZ:3 }
-    this.state = 'not-connected'
-    this.color = 'rgba(240,240,240,0.8)'
+    this.size = { radius:6, infoX:3, infoZ:3 }
+    this.state = 'white'
+    this.color = 'rgba(240,240,240,1.0)'
+    this.color_2d = 'rgba(240,240,240,1.0)'
     this.info_color = 'rgba(220,240,220,0.8)'
 
     // These are used in moving us around later
@@ -43,53 +43,33 @@
       z_max: this.game.world.depth - this.size.hz
     }
     */
+  }
 
-    // issue #2
-    /**
-    // The 'host' of a game gets created with a player instance since
-    // the server already knows who they are. If the server starts a game
-    // with only a host, the other player is set up in the 'else' below
-    if (player_instance) {
-      this.pos = { x:0, y:0, z:0 }
+  //
+
+  game_player.prototype.render_2d = function(opts) {
+    var half_map_width  = game.viewport.width  * 0.5
+      , half_map_height = game.viewport.height * 0.5
+      , map_scale = 0.11
+      , target = {}
+
+    if (opts.lerp) {
+      game.ctx.fillStyle = 'rgba(255,255,255,0.2)'
+      target.pos = this.destpos
+    } else if (opts.ghost) {
+      game.ctx.fillStyle = 'rgba(255,255,255,0.4)'
+      target.pos = this.ghostpos
     } else {
-      // not sure why, but..
-      // players lerp from this position when they are reset ??
-      this.pos = { x:-100, y:0, z:-100 }
+      game.ctx.fillStyle = this.color_2d
+      target.pos = this.pos
     }
-    */
-
-  }
-
-  //
-  
-  game_player.prototype.draw = function(offset_pos) {
-
-    // updated to display only other players in 2D
-    // relative to the location of 'this.selfplayer'
-
-    var half_map_width  = game.viewport.width  * 0.5
-      , half_map_height = game.viewport.height * 0.5
-      , map_scale = 0.11
-
-    // Set the color for this player
-    game.ctx.fillStyle = this.color
-
-    // Draw a rectangle for us
-    /**
-    game.ctx.fillRect(
-      ((this.pos.x - offset_pos.x) * map_scale) + half_map_width - this.size.hx,
-      ((this.pos.z - offset_pos.z) * map_scale) + half_map_height - this.size.hz,
-        this.size.x,
-        this.size.z
-    )
-    */
 
     // Draw a filled circle
     game.ctx.beginPath()
     game.ctx.arc(
-      ((this.pos.x - offset_pos.x) * map_scale) + half_map_width - this.size.r,
-      ((this.pos.z - offset_pos.z) * map_scale) + half_map_height - this.size.r,
-        this.size.r,
+      ((target.pos.x - opts.pos.x) * map_scale) + half_map_width - this.size.radius,
+      ((target.pos.z - opts.pos.z) * map_scale) + half_map_height - this.size.radius,
+        this.size.radius,
         0,
         Math.PI * 2,
         true
@@ -97,106 +77,15 @@
     game.ctx.closePath()
     game.ctx.fill()
 
-    // Draw a status update
-    game.ctx.fillStyle = this.info_color
-    game.ctx.fillText(
-        this.state,
-      ((this.pos.x - offset_pos.x) * map_scale) + half_map_width + this.size.infoX,
-      ((this.pos.z - offset_pos.z) * map_scale) + half_map_height - this.size.infoZ
-    )
-  }
-
-  //
-
-  game_player.prototype.drawserverghost = function(offset_pos) {
-
-    // updated to display only other players in 2D
-    // relative to the location of 'this.selfplayer'
-
-    var half_map_width  = game.viewport.width  * 0.5
-      , half_map_height = game.viewport.height * 0.5
-      , map_scale = 0.11
-
-    // Set the color for this player ghost
-    game.ctx.fillStyle = 'rgba(255,255,255,0.2)'
-
-    // Draw a rectangle for us
-    /**
-    game.ctx.fillRect(
-      ((this.ghostpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.hx,
-      ((this.ghostpos.z - offset_pos.Z) * map_scale) + half_map_height - this.size.hz,
-        this.size.x,
-        this.size.z
-    )
-    */
-
-    // Draw a filled circle
-    game.ctx.beginPath()
-    game.ctx.arc(
-      ((this.ghostpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.r,
-      ((this.ghostpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.r,
-        this.size.r,
-
-        0,
-        Math.PI * 2,
-        true
-    )
-    game.ctx.closePath()
-    game.ctx.fill()
-
-    // Draw a status update
-    game.ctx.fillStyle = this.info_color
-    game.ctx.fillText(
-        this.state,
-      ((this.ghostpos.x - offset_pos.x) * map_scale) + half_map_width + this.size.infoX,
-      ((this.ghostpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.infoZ
-    )
-  }
-
-  //
-
-  game_player.prototype.drawdestghost = function(offset_pos) {
-
-    // updated to display only other players in 2D
-    // relative to the location of 'this.selfplayer'
-
-    var half_map_width  = game.viewport.width  * 0.5
-      , half_map_height = game.viewport.height * 0.5
-      , map_scale = 0.11
-
-    // Set the color for this player ghost
-    game.ctx.fillStyle = 'rgba(255,255,255,0.1)'
-
-    // Draw a rectangle for us
-    /**
-    game.ctx.fillRect(
-      ((this.destpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.hx,
-      ((this.destpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.hz,
-        this.size.x,
-        this.size.z
-    )
-    */
-
-    // Draw a filled circle
-    game.ctx.beginPath()
-    game.ctx.arc(
-      ((this.destpos.x - offset_pos.x) * map_scale) + half_map_width - this.size.r,
-      ((this.destpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.r,
-        this.size.r,
-        0,
-        Math.PI * 2,
-        true
-    )
-    game.ctx.closePath()
-    game.ctx.fill()
-
-    // Draw a status update
-    game.ctx.fillStyle = this.info_color
-    game.ctx.fillText(
-        this.state,
-      ((this.destpos.x - offset_pos.x) * map_scale) + half_map_width + this.size.infoX,
-      ((this.destpos.z - offset_pos.z) * map_scale) + half_map_height - this.size.infoZ
-    )
+    if (opts.player || (opts.lerp === undefined && opts.ghost === undefined)) {
+      // Draw a status update
+      game.ctx.fillStyle = this.info_color
+      game.ctx.fillText(
+          this.state,
+        ((this.pos.x - opts.pos.x) * map_scale) + half_map_width + this.size.infoX,
+        ((this.pos.z - opts.pos.z) * map_scale) + half_map_height - this.size.infoZ
+      )
+    }
   }
 
   //

@@ -72,12 +72,11 @@
         }
         */
 
-        // issue #2
-        this.player_self = {}  // the client player
-        this.player_set  = {}  // other players (within range)
+        // this object initializes to the client player.
+        this.player_self = new game_player(this)
 
-        this.allplayers = []
-        this.selfplayer = new game_player(this)  // just a placeholder
+        // storage of all active players (within range)
+        this.player_set = {}
 
         // The speed at which the clients move.
         this.playerspeed = 120
@@ -110,10 +109,8 @@
         // We start pinging the server to determine latency
         this.client_create_ping_timer()
 
-        // Set their colors from the storage or locally
-        this.color = localStorage.getItem('color') || '#cc8822'
-        localStorage.setItem('color', this.color)
-        this.selfplayer.color = this.color
+        // initial color choice for the client player.
+        this.color = '#eebf00'
 
         // Make this only if requested
         if (String(window.location).indexOf('debug') != -1) {
@@ -285,7 +282,11 @@
   //
 
       game_core.prototype.update_physics = function() {
-        this.client_update_physics()
+        if (n3d_state) {
+          this.n3d_update_physics()
+        } else {
+          this.client_update_physics()
+        }
       }
 
   //
@@ -511,26 +512,13 @@
 
       game_core.prototype.client_onserverupdate_received = function(data) {
 
+        // TODO: DEPRECATED !!
+
+        /**
         // Store the server time (this is offset by the latency in the network, by the time we get it)
         this.server_time = data.t
         // Update our local offset time from the last server update
         this.client_time = this.server_time - (this.net_offset / 1000)
-
-       /**
-        *  TODO: vals should be an Object() keyed by player.uuid
-        *
-        *  IMPORTANT NOTE:
-        *
-        *  1. the vals array is indexed using 'player.index' which can
-        *     never have a zero value, but the array is ALWAYS
-        *     padded with a [0] element !!
-        *
-        *  2. the length of the vals array is not how many users
-        *     are currently in our local game simulation, it goes
-        *     from [0] up to the highest 'player.index' which
-        *     potentially can have many undefined elements as the
-        *     number of connected players climbs (not scalable !!)
-        */
 
         if (data.vals.length < this.allplayers.length) {
           // if some player(s) left in this new update, we can do cleanup.
@@ -559,17 +547,6 @@
             this.allplayers[i].index = i
           }
         }
-
-        // issue #2
-        /**
-        if (this.player_self && this.player_self.uuid != undefined) {
-          var temp_uuid = this.player_self.uuid
-          this.player_self = this.allplayers[data.myi]
-          this.player_self.uuid = temp_uuid
-        } else {
-          throw Error('Cannot create a player_self object without a valid uuid: player #'+data.myi)
-        }
-        */
 
         this.selfplayer = this.allplayers[data.myi]  //myi has my index. 
         this.selfplayer.myi = data.myi
@@ -613,6 +590,8 @@
           // and make sure to correct our local predictions, making the server have final say.
           this.client_process_net_prediction_correction()
         }
+        */
+
       }
 
   //
@@ -657,6 +636,9 @@
 
       game_core.prototype.client_update = function() {
 
+        // TODO: DEPRECATED !!!
+
+        /**
         // 2D Viewport visibility.
         if (! this.show_2D) this.viewport.style.visibility = 'hidden'
         else this.viewport.style.visibility = 'visible'
@@ -715,6 +697,8 @@
     
         // Work out the fps average
         this.client_refresh_fps()
+        */
+
       }
 
   //
@@ -754,7 +738,7 @@
 
       game_core.prototype.client_create_configuration = function() {
 
-        this.show_2D = false
+        this.show_2D = true
         this.show_3D = true
         this.heading = 0
 
@@ -762,7 +746,7 @@
         this.naive_approach = false     // Whether or not to use the naive approach
         this.show_server_pos = false    // Whether or not to show the server position
         this.show_dest_pos = false      // Whether or not to show the interpolation goal
-        this.client_predict = false     // Whether or not the client is predicting input
+        this.client_predict = true      // Whether or not the client is predicting input
         this.input_seq = 0              // When predicting client inputs, we store the last input as a sequence number
         this.client_smoothing = true    // Whether or not the client side prediction tries to smooth things out
         this.client_smooth = 12         // amount of smoothing to apply to client update dest
@@ -803,9 +787,8 @@
         // We want to know when we change our color so we can tell
         // the server to tell the other clients for us
         this.colorcontrol.onChange(function(value) {
-            this.selfplayer.color = value
-            localStorage.setItem('color', value)
-            this.socket.send('c.' + this.selfplayer.myi+"," + value)
+            this.player_set[this.player_self.uuid].color = value
+            //this.socket.send('c.' + this.player_self.uuid+"," + value)
         }.bind(this))
 
         _playersettings.add(this, 'show_2D').listen()
@@ -835,7 +818,7 @@
         _consettings.add(this, 'net_ping').step(0.001).listen()
 
         // When adding fake lag, we need to tell the server about it.
-        var lag_control = _consettings.add(this, 'fake_lag').step(0.001).listen()
+        var lag_control = _consettings.add(this, 'fake_lag').min(0.0).step(0.001).listen()
         lag_control.onChange(function(value) {
           this.socket.send('l.' + value)
         }.bind(this))
@@ -941,9 +924,9 @@
         // issue #2
         this.player_self.uuid = data.id
 
-        this.selfplayer.info_color = '#cc0000'
-        this.selfplayer.state = 'connected'
-        this.selfplayer.online = true
+        //this.player_self.info_color = '#cc0000'
+        //this.player_self.state = 'connected'
+        //this.player_self.online = true
       }
 
   //
@@ -1005,6 +988,9 @@
 
       game_core.prototype.client_ondisconnect = function(data) {
 
+        // TODO: DEPRECATED !!
+
+        /**
         // When we disconnect, we don't know if the other player is
         // connected or not, and since we aren't, everything goes to offline
 
@@ -1016,6 +1002,8 @@
         this.selfplayer.info_color = 'rgba(255,255,255,0.1)'
         this.selfplayer.state = 'not-connected'
         this.selfplayer.online = false
+        */
+
       }
 
   //
@@ -1028,7 +1016,8 @@
         // When we connect, we are not 'connected' until we have a server id
         // and are placed in a game by the server. The server sends us a message for that.
         this.socket.on('connect', function() {
-          this.selfplayer.state = 'connecting'
+          //this.selfplayer.state = 'connecting'
+          this.player_self.state = 'connecting'
         }.bind(this))
 
         // Sent when we are disconnected (network, server down, etc)
@@ -1088,10 +1077,10 @@
         }
 
         // Draw some information for the host
-        if (this.selfplayer.host) {
-          this.ctx.fillStyle = 'rgba(255,255,255,0.7)'
-          this.ctx.fillText('You are the host', 10 , 465)
-        }
+        //if (this.selfplayer.host) {
+        //  this.ctx.fillStyle = 'rgba(255,255,255,0.7)'
+        //  this.ctx.fillText('You are the host', 10 , 465)
+        //}
 
         // Reset the style back to full white.
         this.ctx.fillStyle = 'rgba(255,255,255,1)'
@@ -1111,10 +1100,19 @@
       game_core.prototype.n3d_add_player = function(id, pos, idx) {
         // need player to exist so we can apply the update.
         this.player_set[id] = new game_player(this)
-        this.player_set[id].pos   = this.player_set[id].cur_state = pos
+        this.player_set[id].cur_state = pos
+
+        // need to override these values obtained from server.
         this.player_set[id].index = parseInt(idx)
         this.player_set[id].state = this.player_set[id].index ? 'orange' : 'lemon'
         this.player_set[id].color = this.player_set[id].index ? '#EE9000' : '#EEEE00'
+        this.player_set[id].color_2d = this.player_set[id].index ? '#EE9000' : '#EEEE00'
+
+        if (id == this.player_self.uuid && this.colorcontrol != undefined) {
+          this.colorcontrol.setValue(this.player_set[id].color)
+        }
+
+        // add player mesh into 3d scene.
         n3d_scene_add_mesh(this.player_set[id], id)
         console.log("created player: " + id)
       }
@@ -1156,10 +1154,18 @@
 
         // make sure the player_self shortcut is valid.
         // this should only happen once !! TODO: [Test]
-        if (this.player_self.pos == undefined) {
+        /**
+        if (this.player_self.state === 'white') {
           this.player_self = this.player_set[data.uuid]
           this.player_self.uuid = data.uuid
+
+          // reset client player state from server update value.
+          this.player_self.index = parseInt(data.vals[data.uuid].idx)
+          this.player_self.state = this.player_self.index ? 'orange' : 'lemon'
+          this.player_self.color = this.player_self.index ? '#EE9000' : '#EEEE00'
+          this.player_self.color_2d = this.player_self.index ? '#EE9000' : '#EEEE00'
         }
+        */
 
         // delete local players that don't exist in update
         // because they are out-of-range (issue #3) or disconnected.
@@ -1334,21 +1340,24 @@
 
         for (var id in this.player_set) {
 
-          if (this.player_self.uuid != id) {
-            // only showing _other_ players on the 2d map !!
+          if (this.player_self.uuid != id || this.fake_lag > 0) {
+            // only showing _other_ players on the 2d map
+            // (rendering them in reverse opacity order)
+            //
+            // unless we are simulating network lag on client !!
 
-            // Now they should have updated, we can draw the entities themselves
-            this.player_set[id].draw(map_offset_pos)
-
-            // and these
+            // destination ghost?
             if (this.show_dest_pos && !this.naive_approach) {
-              this.player_set[id].drawdestghost(map_offset_pos)
+              this.player_set[id].render_2d({ lerp: true, pos: map_offset_pos })
             }
 
-            // and lastly draw these
+            // server ghost?
             if (this.show_server_pos && ! this.naive_approach) {
-              this.player_set[id].drawserverghost(map_offset_pos)
+              this.player_set[id].render_2d({ ghost: true, pos: map_offset_pos })
             }
+
+            // player
+            this.player_set[id].render_2d({ player: true, pos: map_offset_pos })
           }
         }
     

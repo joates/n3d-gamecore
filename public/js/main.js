@@ -147,8 +147,10 @@
     }
 
     if (n3d_players[uuid]) {
-      // camera follows our player.
+      // self color changed ?
+      n3d_players[uuid].material.color = new THREE.Color(player_set[uuid].color)
 
+      // camera follows our player.
       camera.updateMatrixWorld()
       var relativeCameraOffset = new THREE.Vector3(0, 20, 60)
 
@@ -184,7 +186,7 @@
     var m = new THREE.MeshLambertMaterial({ color: p.color })
     n3d_players[id] = new THREE.Mesh( g, m )
     n3d_players[id].position.copy(p.pos)
-    scene.add(n3d_players[id])
+    if (scene != undefined) scene.add(n3d_players[id])
   }
 
   //
