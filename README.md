@@ -1,4 +1,4 @@
-## n3d-gamecore (0.0.1-alpha)
+## n3d-gamecore (0.0.2-alpha)
 
 checkout the [dev branch](https://github.com/joates/n3d-gamecore/tree/dev) for the most recent build.
 
