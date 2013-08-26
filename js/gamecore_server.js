@@ -364,6 +364,8 @@
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.handle_server_input = function(client, input, input_time, input_seq) {
 
         // Fetch which client this refers
@@ -388,6 +390,7 @@
           }
         }
       }
+      */
 
   //
 
@@ -451,7 +454,7 @@
 
   //
 
-      game_core.prototype.n3d_handle_server_input = function(client, input, input_time, input_seq) {
+      game_core.prototype.handle_server_input = function(client, input, input_time, input_seq) {
 
         var player_client = this.player_manifest[client.uuid]
 

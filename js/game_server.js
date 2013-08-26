@@ -17,9 +17,6 @@
    *  MIT Licensed.
    */
 
-    var n3d_state = true
-
-
     var game_server = module.exports = { games: {}, game_count: 0 }
       , uuid        = require('node-uuid')
       , color       = require('./ansi-color.js')
@@ -97,10 +94,11 @@
           this.onInput(client, message_parts)
         } else if (message_type == 'p') {
             client.send('s.p.' + message_parts[1])
+
+        // issue #3
+        /**
         } else if (message_type == 'c') {
 
-          // issue #3
-          /**
           // Client changed their color.
           client.game.player_host.send('s.c.' + message_parts[1])
 
@@ -109,7 +107,7 @@
             var p = client.game.player_client[i]
             p.send('s.c.' + message_parts[1])
           }
-          */
+        */
 
         } else if (message_type == 'l') {
           // A client is asking for lag simulation
@@ -120,8 +118,7 @@
   //
 
       game_server.onInput = function(client, parts) {
-        // The input commands come in like 1:-2,
-        // so we split them up and then update the players.
+        // decode the input commands and update the players.
         var input_commands = parts[1].split(':')
         var input_time = parts[2].replace('-', '.')
         var input_seq = parts[3]
@@ -129,13 +126,7 @@
         // the client should be in a game, so
         // we can tell that game to handle the input
         if (client && client.game && client.game.gamecore) {
-
-          // issue #2
-          if (n3d_state) {
-            client.game.gamecore.n3d_handle_server_input(client, input_commands, input_time, input_seq)
-          } else {
-            client.game.gamecore.handle_server_input(client, input_commands, input_time, input_seq)
-          }
+          client.game.gamecore.handle_server_input(client, input_commands, input_time, input_seq)
         }
       }
 
@@ -201,29 +192,6 @@
 
   //
 
-      game_server.start_game = function(game) {
-
-        // issue #2
-        /**
-        for (var i = game.player_client.length - 1; i >= 0; i--) {
-          game.player_client[i].send('s.j.' + game.player_host.uuid)
-          game.player_client[i].game = game
-
-          // now we tell them that the game is ready to start
-          // clients will reset their positions in this case.
-          game.player_client[i].send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
-        }
-
-        //server should get ready and reset stuff too
-        game.player_host.send('s.r.'+ String(game.gamecore.local_time).replace('.', '-'))
-
-        //set this flag, so that the update loop can run it.
-        game.active = true  // this is not even used !!
-        */
-      }
-
-  //
-
       game_server.join_game = function(player) {
 
         if (this.game_count) {
@@ -242,18 +210,12 @@
             if (game_instance.player_count < game_instance.player_capacity) {
 
               joined_a_game = true
-              // increase the player count and store
-              // the player as the client of this game
 
-              // issue #2
-              //game_instance.player_client.push(player)
+              // connect client to this game, create a
+              // player & increase the player count.
               game_instance.gamecore.player_connect(player)
               player.game = game_instance
               game_instance.player_count++
-
-              // start running the game on the server,
-              // which will tell them to respawn/start
-              this.start_game(game_instance)
 
               }
               if (joined_a_game) break
@@ -262,7 +224,6 @@
             //now if we didn't join a game, we create one
             if (! joined_a_game) {
               this.create_game(player)
-              // issue #2
               this.join_game(player)    // and join it.
             }
 
@@ -270,7 +231,6 @@
 
           //no games? create one!
           this.create_game(player)
-          // issue #2
           this.join_game(player)    // and join it.
         }
       }

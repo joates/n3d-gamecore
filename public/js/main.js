@@ -104,8 +104,7 @@
       camera.position.copy(cameraOffset)
       camera.lookAt(players[uuid].position)
 
-      // TODO:
-      //update_player_heading(uuid)
+      update_player_heading(uuid)
 
       // process controller coordinates
       cX = controller.deltaX() * 0.016
@@ -158,7 +157,8 @@
     heading = Math.floor(heading % 360)
     //heading = "Heading: " + heading + '&deg;'
     //document.getElementById("heading").innerHTML = heading
-    players[id].heading = heading
+    //players[id].heading = heading
+    game_core.heading = heading
   }
 
   //

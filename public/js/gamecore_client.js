@@ -510,11 +510,10 @@
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_onserverupdate_received = function(data) {
 
-        // TODO: DEPRECATED !!
-
-        /**
         // Store the server time (this is offset by the latency in the network, by the time we get it)
         this.server_time = data.t
         // Update our local offset time from the last server update
@@ -590,9 +589,8 @@
           // and make sure to correct our local predictions, making the server have final say.
           this.client_process_net_prediction_correction()
         }
-        */
-
       }
+      */
 
   //
 
@@ -784,8 +782,7 @@
         var _playersettings = this.gui.addFolder('Your settings')
         this.colorcontrol = _playersettings.addColor(this, 'color')
 
-        // We want to know when we change our color so we can tell
-        // the server to tell the other clients for us
+        // Register event to fire when we change color.
         this.colorcontrol.onChange(function(value) {
             this.player_set[this.player_self.uuid].color = value
             //this.socket.send('c.' + this.player_self.uuid+"," + value)
@@ -793,7 +790,7 @@
 
         _playersettings.add(this, 'show_2D').listen()
         _playersettings.add(this, 'show_3D').listen()
-        //_playersettings.add(this, 'heading').listen()
+        _playersettings.add(this, 'heading').listen()
         _playersettings.open()
 
         var _othersettings = this.gui.addFolder('Methods')
