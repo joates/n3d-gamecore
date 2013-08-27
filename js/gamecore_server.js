@@ -76,7 +76,7 @@
 
         // The speed at which the clients move.
         this.playerspeed = 120
-        this.playercount = 0  // used for player's gameid within this game.
+        this.playercount = 0
 
         // Set up some physics integration values
         this._pdt  = 0.0001                 //The physics update delta time

@@ -71,6 +71,7 @@
 
         // The speed at which the clients move.
         this.playerspeed = 120
+        this.playercount = 0
 
         // Set up some physics integration values
         this._pdt  = 0.0001                 //The physics update delta time
@@ -168,50 +169,8 @@
 
   //
 
-  /**
-   *  Shared between server and client.
-   *  In this example, `item` is always of type game_player.
-   */
-
-      game_core.prototype.check_collision = function(item) {
-
+      game_core.prototype.check_collision = function(player) {
         // TODO: collisions not implemented yet !
-        /**
-        // left
-        if (item.pos.x <= item.pos_limits.x_min) {
-          item.pos.x = item.pos_limits.x_min
-        }
-
-        // right
-        if (item.pos.x >= item.pos_limits.x_max) {
-          item.pos.x = item.pos_limits.x_max
-        }
-    
-        // floor
-        if (item.pos.y <= item.pos_limits.y_min) {
-          item.pos.y = item.pos_limits.y_min
-        }
-
-        // top
-        if (item.pos.y >= item.pos_limits.y_max) {
-          item.pos.y = item.pos_limits.y_max
-        }
-
-        // front
-        if (item.pos.z <= item.pos_limits.z_min) {
-          item.pos.z = item.pos_limits.z_min
-        }
-
-        // back
-        if (item.pos.z >= item.pos_limits.z_max) {
-          item.pos.z = item.pos_limits.z_max
-        }
-
-        // Fixed point helps be more deterministic
-        item.pos.x = item.pos.x.fixed(4)
-        item.pos.y = item.pos.y.fixed(4)
-        item.pos.z = item.pos.z.fixed(4)
-        */
       }
 
   //
@@ -360,20 +319,6 @@
 
   //
 
-      game_core.prototype.client_reset_positions = function() {
-
-        for (var i=0, l=this.allplayers.length; i<l; i++) {
-          if (this.allplayers[i] && ! isNaN(this.allplayers[i].pos.x)) {
-            var p = this.allplayers[i]
-            p.old_state.pos = this.pos(p.pos)
-            p.cur_state.pos = this.pos(p.pos)
-            p.ghostpos = this.pos(p.pos)
-            p.destpos = this.pos(p.pos)
-          }
-        }
-      }
-
-  //
 
       game_core.prototype.client_onconnected = function(data) {
 
@@ -401,11 +346,8 @@
           case 's': //server message
 
             switch (subcommand) {
-              case 'j' : //join a game requested
-                this.client_onjoingame(commanddata); break
-
-              case 'e' : //end game requested
-                this.client_ondisconnect(commanddata); break
+              //case 'e' : //end game requested
+              //  this.client_ondisconnect(commanddata); break
 
               case 'p' : //server ping
                 this.client_onping(commanddata); break
@@ -418,10 +360,7 @@
   //
 
       game_core.prototype.client_ondisconnect = function(data) {
-
-        // Any cleanup required when we disconnect.
-        this.player_self.info_color = 'rgba(255,255,255,0.2)'
-        this.player_self.state = 'not-connected'
+        // Perform any cleanup required when we disconnect.
       }
 
   //
@@ -443,8 +382,6 @@
         this.socket.on('onserverupdate', this.client_onserverupdate_received.bind(this))
         // Handle when we connect to the server, showing state and storing id's.
         this.socket.on('onconnected', this.client_onconnected.bind(this))
-        // On error we just show that we are not connected for now. Can print the data.
-        this.socket.on('error', this.client_ondisconnect.bind(this))
         // On message from the server, we parse the commands and send it to the handlers
         this.socket.on('message', this.client_onnetmessage.bind(this))
       }
@@ -495,12 +432,17 @@
       game_core.prototype.remove_player = function(id) {
         // at some point we may need to cleanup player_set
         // removing out-of-range players with no recent updates.
+        this.playercount--
+        scene_remove_mesh(id)
+        delete this.player_set[id]
+        console.log('Player quit: ' + this.playercount + ' remaining')
       }
 
   //
 
       game_core.prototype.add_player = function(id, pos, idx) {
         // need player to exist so we can apply the update.
+        this.playercount++
         this.player_set[id] = new game_player(this)
         this.player_set[id].cur_state = pos
 
@@ -516,7 +458,7 @@
 
         // add player mesh into 3d scene.
         scene_add_mesh(this.player_set[id], id)
-        console.log("created player: " + id)
+        console.log('Player joined: ' + this.playercount + ' total')
       }
 
   //
@@ -529,7 +471,7 @@
         for (var id in data.vals) {
 
           // player must exist before it can be updated.
-          if (this.player_set[id] == undefined) {
+          if (this.player_set[id] === undefined) {
             // create local player character (with pos & color).
             this.add_player(id, data.vals[id].pos, data.vals[id].idx)
             // player color is decided, we don't need this anymore.
@@ -553,12 +495,11 @@
           }
         }
 
-        // delete local players that don't exist in update
+        // purge any local players that don't exist in this update
         // because they are out-of-range (issue #3) or disconnected.
         for (var id in this.player_set) {
-          if (data.vals[id] == undefined) {
-            scene_remove_mesh(id)
-            delete this.player_set[id]
+          if (data.vals[id] === undefined) {
+            this.remove_player(id)
           }
         }
       }
