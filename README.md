@@ -22,25 +22,18 @@ This is **not** a fully functional game, it is intended to be a scalable realtim
 Read the original article here (2D only): 
 http://buildnewgames.com/real-time-multiplayer/
 
-#### Getting started (Using npm package.json)
-* Get three.js (info [here](http://threejs.org))
-* `git clone` this repository and `cd` into it
-* check that the links in `public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
-* Get node.js (info [here](http://nodejs.org/download/))
-  * run `npm install` inside the cloned folder
-  * run `node app.js` inside the cloned folder
-* Visit `http://localhost:8000` with your browser
-  * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
-
-#### Getting started (Manual install)
-* Get three.js (info [here](http://threejs.org))
-* `git clone` this repository and `cd` into it
-* check that the links in `public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
-* Get node.js (info [here](http://nodejs.org/download/))
-  * Install socket.io `npm install socket.io`
-  * Install node-udid `npm install node-uuid`
-  * Install express `npm install express`
-* Run `node app.js` inside the cloned folder
+#### Getting started
+* Grab the most recent release bundle from [here](https://github.com/joates/n3d-gamecore/releases)
+* extract all the files (from the zip/tarball)
+* _rename_ `n3d-gamecore-<release_name>` to just `n3d-gamecore`
+* type `cd n3d-gamecore/public/`
+* Grab the latest three.js release from [here](https://github.com/mrdoob/three.js/releases)
+* extract all the files (from three.js zip/tarball)
+* check that the links in `n3d-gamecore/public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
+  * probably just need to _rename_ the `three.js-r??` folder to `three.js`
+* type `cd ..` to get back to the `n3d-gamecore` root folder
+* run `npm install` (to download the node module dependencies)
+* run `npm start` (to start the game server running)
 * Visit `http://localhost:8000` with your browser
   * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
 
