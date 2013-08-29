@@ -3,6 +3,10 @@
 checkout the [dev branch](https://github.com/joates/n3d-gamecore/tree/dev) for the most recent build.
 
 
+*screenshot (0.0.2-alpha release):*
+![0.0.2-alpha screenshot](img/n3d-gamecore-alpha2-orange-and-lemon-players-screenshot.png)
+
+
 #### Change history
 * _Aug.2012_  Original Source by [Sven Bergström](https://github.com/underscorediscovery)
 * _Apr.2013_  Forked and updated by [Asad Memon](https://github.com/asadlionpk)
