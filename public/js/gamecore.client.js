@@ -70,7 +70,7 @@
         this.player_set = {}
 
         // The speed at which the clients move.
-        this.playerspeed = 120
+        this.playerspeed = 90
         this.playercount = 0
 
         // Set up some physics integration values
@@ -136,15 +136,8 @@
       game_core.prototype.v_mul_scalar = function(a, b) { return { x:(a.x * b).fixed(), y:(a.y * b).fixed(), z:(a.z * b).fixed() } }
       // For the server, we need to cancel the setTimeout that the polyfill creates
       game_core.prototype.stop_update = function() { window.cancelAnimationFrame(this.updateid) }
-
       // Simple linear interpolation
-      game_core.prototype.lerp = function(p, n, t) {
-        var _t = Number(t);
-        _t = (Math.max(0, Math.min(1, _t))).fixed();
-        //return (p + _t * (n - p)).fixed()
-        return p * (1 - _t) + n * t
-      }
-
+      game_core.prototype.lerp = function(p, n, t) { var _t = Number(t); _t = (Math.max(0, Math.min(1, _t))).fixed(); return (p * (1 - _t) + n * _t).fixed() }
       // Simple linear interpolation between 2 vectors
       game_core.prototype.v_lerp = function(v, tv, t) { return { x:this.lerp(v.x, tv.x, t), y:this.lerp(v.y, tv.y, t), z:this.lerp(v.z, tv.z, t) } }
 
@@ -233,7 +226,7 @@
         this.show_3D = true
         this.heading = 0
 
-        this.show_help = false          // Whether or not to draw the help text
+        //this.show_help = false          // Whether or not to draw the help text
         this.naive_approach = false     // Whether or not to use the naive approach
         this.show_server_pos = false    // Whether or not to show the server position
         this.show_dest_pos = false      // Whether or not to show the interpolation goal
@@ -280,8 +273,14 @@
           this.player_set[this.player_self.uuid].color = value
         }.bind(this))
 
-        _playersettings.add(this, 'show_2D').listen()
-        _playersettings.add(this, 'show_3D').listen()
+        _playersettings.add(this, 'show_2D').onChange(function(value) {
+          this.viewport.style.visibility = value ? 'visible' : 'hidden'
+        }.bind(this))
+
+        _playersettings.add(this, 'show_3D').onChange(function(value) {
+          this.scene.style.visibility = value ? 'visible' : 'hidden'
+        }.bind(this))
+
         _playersettings.add(this, 'heading').listen()
         _playersettings.open()
 
@@ -294,7 +293,7 @@
 
         var _debugsettings = this.gui.addFolder('Debug view')
         
-        _debugsettings.add(this, 'show_help').listen()
+        //_debugsettings.add(this, 'show_help').listen()
         _debugsettings.add(this, 'fps_avg').listen()
         _debugsettings.add(this, 'show_server_pos').listen()
         _debugsettings.add(this, 'show_dest_pos').listen()
@@ -412,6 +411,8 @@
 
   //
 
+      // TODO: DEPRECATED !!
+      /**
       game_core.prototype.client_draw_info = function() {
 
         // We don't want this to be too distracting
@@ -433,6 +434,7 @@
         // Reset the style back to full white.
         this.ctx.fillStyle = 'rgba(255,255,255,1)'
       }
+      */
 
   //
 
@@ -631,62 +633,53 @@
 
       game_core.prototype.client_update = function() {
 
-        // 2D Viewport visibility.
-        if (! this.show_2D) this.viewport.style.visibility = 'hidden'
-        else this.viewport.style.visibility = 'visible'
+        // Check for client movement (if any).
+        // Values are transmitted to the server and also
+        // stored locally and get processed on next physics tick.
+        var input_coords = scene_get_inputs()
+        if (input_coords) this.client_handle_input(input_coords)
 
-        // 3D Viewport visibility.
-        if (! this.show_3D) this.scene.style.visibility = 'hidden'
-        else this.scene.style.visibility = 'visible'
-
-        // Update & Render the 3D scene.
-        var input_coords = scene_update(this.player_set, this.player_self.uuid)
-        scene_render()
-
-        // 2D viewport (player map)
-        this.ctx.clearRect(0, 0, this.viewport.width, this.viewport.height)
-
-        // draw help/information if required
-        this.client_draw_info()
-
-        // Capture inputs from the player
-        this.client_handle_input(input_coords)
-
-        // Network player just gets drawn normally, with interpolation from
-        // the server updates, smoothing out the positions from the past.
-        // Note that if we don't have prediction enabled - this will also
-        // update the actual local client position on screen as well.
+        // Set actual player positions from the server update.
         if (! this.naive_approach) {
           this.client_process_net_updates()
         }
-
-        // When we are doing client side prediction, we smooth out our position
-        // across frames using local input states we have stored.
         this.client_update_local_position()
 
-        // need the client players position to use when calculating map view.
-        var map_offset_pos = this.player_self.pos
+        // Update player locations in the 3D scene.
+        scene_update(this.player_set, this.player_self.uuid)
 
-        for (var id in this.player_set) {
+        if (this.show_3D) scene_render()
 
-          if (this.player_self.uuid != id || this.fake_lag > 0) {
-            // only showing _other_ players on the 2d map
-            // (rendering them in reverse opacity order)
-            //
-            // unless we are simulating network lag on client !!
+        if (this.show_2D) {
 
-            // destination ghost?
-            if (this.show_dest_pos && !this.naive_approach) {
-              this.player_set[id].render_2d({ lerp: true, pos: map_offset_pos })
+          // need the client players current position to use
+          // when calculating relative positions on the map view.
+          var map_offset_pos = this.player_self.pos
+
+          // Clear 2D viewport (player map)
+          this.ctx.clearRect(0, 0, this.viewport.width, this.viewport.height)
+
+          for (var id in this.player_set) {
+
+            if (this.player_self.uuid != id || this.fake_lag > 0) {
+              // only showing _other_ players on the 2d map
+              // (rendering them in reverse opacity order)
+              //
+              // unless we are simulating network lag on client !!
+
+              // destination ghost?
+              if (this.show_dest_pos && !this.naive_approach) {
+                this.player_set[id].render_2d({ lerp: true, pos: map_offset_pos })
+              }
+
+              // server ghost?
+              if (this.show_server_pos && ! this.naive_approach) {
+                this.player_set[id].render_2d({ ghost: true, pos: map_offset_pos })
+              }
+
+              // player
+              this.player_set[id].render_2d({ player: true, pos: map_offset_pos })
             }
-
-            // server ghost?
-            if (this.show_server_pos && ! this.naive_approach) {
-              this.player_set[id].render_2d({ ghost: true, pos: map_offset_pos })
-            }
-
-            // player
-            this.player_set[id].render_2d({ player: true, pos: map_offset_pos })
           }
         }
     

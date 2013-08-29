@@ -75,7 +75,7 @@
         this.player_manifest = {}
 
         // The speed at which the clients move.
-        this.playerspeed = 120
+        this.playerspeed = 90
         this.playercount = 0
 
         // Set up some physics integration values

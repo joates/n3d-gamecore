@@ -47,13 +47,13 @@
     })
     planeGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
     planeGeometry.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI / 4))
-    planeGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.4, 0))
+    planeGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.25, 0))
     var plane = new THREE.Mesh( planeGeometry, planeMaterial )
 
     // tile grid.
     var gridGeometry = new THREE.PlaneGeometry( 1000, 1000, 15, 15 )
     var gridMaterial = new THREE.MeshBasicMaterial({
-      color: 0x202020, wireframe: true, wireframeLinewidth: 2.0
+      color: 0x8888CC, wireframe: true, wireframeLinewidth: 1.5
     })
     gridGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
     gridGeometry.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI / 4))
@@ -106,21 +106,26 @@
       camera.lookAt(players[uuid].position)
 
       update_player_heading(uuid)
-
-      // process controller coordinates
-      cX = controller.deltaX() * 0.016
-      cZ = controller.deltaY() * 0.016
-
-      // ignore smaller controller movements,
-      // and avoid the additional calculations that follow..
-      if ((cX > -0.1 && cX < 0.1) && (cZ > -0.1 && cZ < 0.1)) return
-
-      // clamp the values (i.e. max velocity)
-      cX = Math.min(Math.max(cX, -3), 3)
-      cZ = Math.min(Math.max(cZ, -3), 3)
-
-      return { x:cX, y:0, z:cZ }
     }
+  }
+
+  //
+
+  function scene_get_inputs() {
+
+    // process controller coordinates
+    cX = controller.deltaX() * 0.016
+    cZ = controller.deltaY() * 0.016
+
+    // ignore smaller controller movements,
+    // and avoid the additional calculations that follow..
+    if ((cX > -0.1 && cX < 0.1) && (cZ > -0.1 && cZ < 0.1)) return
+
+    // clamp the values (i.e. max velocity)
+    cX = Math.min(Math.max(cX, -3), 3)
+    cZ = Math.min(Math.max(cZ, -3), 3)
+
+    return { x:cX, y:0, z:cZ }
   }
 
   //
