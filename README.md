@@ -37,5 +37,8 @@ http://buildnewgames.com/real-time-multiplayer/
 * Visit `http://localhost:8000` with your browser
   * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
 
+* NOTE: the game controller is designed for a device with a touchscreen, if you have a normal (non-touch) screen you can either
+  * enable the `Emulate touch events` in browser setting (if available)
+  * change `mouseSupport: false` to `true` in `public/js/main.js`
 
 MIT Licensed.
