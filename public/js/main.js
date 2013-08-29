@@ -26,6 +26,7 @@
     HEIGHT = window.innerHeight
 
     scene = new THREE.Scene()
+    scene.fog = new THREE.Fog(0x111133, 0, 300);
 
     controller = new Controller({ mouseSupport: false, strokeStyle: '#FFFF00' })
 
@@ -67,7 +68,7 @@
 
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(WIDTH, HEIGHT)
-    renderer.autoClear = true
+    renderer.setClearColor(scene.fog.color, 1);
 
     container = document.getElementById('container')
     container.appendChild(renderer.domElement)

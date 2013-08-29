@@ -233,7 +233,7 @@
         this.client_predict = true      // Whether or not the client is predicting input
         this.input_seq = 0              // When predicting client inputs, we store the last input as a sequence number
         this.client_smoothing = true    // Whether or not the client side prediction tries to smooth things out
-        this.client_smooth = 12         // amount of smoothing to apply to client update dest
+        this.client_smooth = 8          // amount of smoothing to apply to client update dest
 
         this.net_latency = 0.001        // the latency between the client and the server (ping/2)
         this.net_ping = 0.001           // The round trip time from here to the server,and back
