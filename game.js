@@ -1,8 +1,8 @@
 
-  //  app.js
+  //  game.js
   //  by joates (Aug-2013)
 
-      var game_server = require('./js/game_server.js')
+      var game_server = require('./js/registry.js')
         , express = require('express')
         , http    = require('http')
         , io      = require('socket.io')

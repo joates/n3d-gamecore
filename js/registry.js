@@ -26,7 +26,7 @@
     global.window = global.document = global
 
     // Import shared game library code.
-    require('./gamecore_server.js')
+    require('./gamecore.server.js')
     require('./player.js')
 
   //
