@@ -2,7 +2,7 @@
 
 the codebase is considered **ALPHA quality** only, should be OK to use but is 'unstable' because the API will probably change without notice. If you pull updates from 'dev' branch and it breaks your code, its on you, *that* is your warning. _Use at own risk_.
 
-You will need to install the *Three.js* library wherever you are hosting the server because it is not bundled with this component. See the [website](http://threejs.org) for more info.
+You also need to install the *Three.js* library wherever you are hosting the server because it is not bundled with this component.
 
 
 ####3D WebGL Multi-Player Game Engine (Node.js / Three.js / HTML5)
@@ -29,16 +29,21 @@ http://buildnewgames.com/real-time-multiplayer/
 * type `cd n3d-gamecore/public/`
 * Grab the latest three.js release from [here](https://github.com/mrdoob/three.js/releases)
 * extract all the files (from three.js zip/tarball)
-* check that the links in `n3d-gamecore/public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
-  * probably just need to _rename_ the `three.js-r??` folder to `three.js`
+* check that the links in `n3d-gamecore/public/index.html` can access `three.min.js`
+  (& `dat.gui.min.js` is optional)
+  * you will probably just need to _rename_ the `three.js-r??` folder to `three.js`
 * type `cd ..` to get back to the `n3d-gamecore` root folder
 * run `npm install` (to download the node module dependencies)
 * run `npm start` (to start the game server running)
 * Visit `http://localhost:8000` with your browser
   * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
 
-* NOTE: the game controller is designed for a device with a touchscreen, if you have a normal (non-touch) screen you can either
-  * enable the `Emulate touch events` in browser setting (if available)
-  * change `mouseSupport: false` to `true` in `public/js/main.js`
+
+NOTE: the movement controller is designed for a device with a touchscreen,
+if you have a normal (non-touch) screen you can either
+
+1. enable the `Emulate touch events` setting in the browser ( _and use the mouse_ ) or
+2. change `mouseSupport: false` to `true` in `public/js/main.js` ( _and use the mouse_ )
+
 
 MIT Licensed.
