@@ -41,8 +41,9 @@
     scene.add(light)
 
     // ground plane.
-    var planeGeometry = new THREE.PlaneGeometry( 1000, 1000, 1, 1 )
-    var planeMaterial = new THREE.MeshLambertMaterial({
+    var planeSize = 1024
+      , planeGeometry = new THREE.PlaneGeometry( planeSize, planeSize, 1, 1 )
+      , planeMaterial = new THREE.MeshLambertMaterial({
       color: 0x6666AA, side: THREE.FrontSide
     })
     planeGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
@@ -50,20 +51,41 @@
     planeGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.25, 0))
     var plane = new THREE.Mesh( planeGeometry, planeMaterial )
 
-    // tile grid.
-    var gridGeometry = new THREE.PlaneGeometry( 1000, 1000, 15, 15 )
-    var gridMaterial = new THREE.MeshBasicMaterial({
-      color: 0x8888CC, wireframe: true, wireframeLinewidth: 1.5
-    })
-    gridGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
-    gridGeometry.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI / 4))
-    gridGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.2, 0))
-    var grid = new THREE.Mesh( gridGeometry, gridMaterial )
-
-    // merge plane & grid into a single object.
+    // add a parent floor object.
     var floor = new THREE.Object3D()
     floor.add(plane)
-    floor.add(grid)
+
+    // merge grid lines into floor object.
+    var gridSize = 9
+      , gridScale = planeSize / gridSize
+      , half_cell = gridScale * 0.5
+      , gridMaterial = new THREE.LineBasicMaterial({ color: 0x8888CC, linewidth: 1.5 })
+    for (var i=1, l=gridSize; i<l; i++) {
+
+      // horizontal direction
+      var gridGeometryX = new THREE.Geometry()
+      gridGeometryX.vertices.push(
+        new THREE.Vector3(-512, 0, -512 + (i * gridScale)),
+        new THREE.Vector3( 512, 0, -512 + (i * gridScale))
+      )
+      gridGeometryX.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI / 4))
+      gridGeometryX.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.2, 0))
+      var gridX = new THREE.Line( gridGeometryX, gridMaterial )
+      floor.add(gridX)
+
+      // vertical direction
+      var gridGeometryZ = new THREE.Geometry()
+      gridGeometryZ.vertices.push(
+        new THREE.Vector3(-512 + (i * gridScale), 0, -512),
+        new THREE.Vector3(-512 + (i * gridScale), 0,  512)
+      )
+      gridGeometryZ.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI / 4))
+      gridGeometryZ.applyMatrix(new THREE.Matrix4().makeTranslation(0, -1.2, 0))
+      var gridZ = new THREE.Line( gridGeometryZ, gridMaterial )
+      floor.add(gridZ)
+    }
+
+    // add floor (plane & grid lines) to the scene.
     scene.add(floor)
 
     renderer = new THREE.WebGLRenderer({ antialias: true })
