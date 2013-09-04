@@ -26,8 +26,7 @@
     global.window = global.document = global
 
     // Import shared game library code.
-    require('./gamecore.server.js')
-    require('./player.js')
+    var game_core = require('./gamecore.server.js')
 
   //
 
@@ -132,7 +131,7 @@
 
   //
 
-      game_server.create_game = function(player) {
+      game_server.create_game = function(client) {
 
         // Create a new game instance
         var thegame = {
@@ -153,9 +152,9 @@
         thegame.gamecore.update(new Date().getTime())
 
         // the client needs to know which game it is connected to.
-        player.game = thegame
+        client.game = thegame
 
-        this.log('   Game start: ' + color.white + player.game.uuid + color.reset + '   ')
+        this.log('   Game start: ' + color.white + client.game.uuid + color.reset + '   ')
 
         // return the new game instance.
         return thegame
@@ -192,7 +191,7 @@
 
   //
 
-      game_server.join_game = function(player) {
+      game_server.join_game = function(client) {
 
         if (this.game_count) {
 
@@ -213,8 +212,8 @@
 
               // connect client to this game, create a
               // player & increase the player count.
-              game_instance.gamecore.player_connect(player)
-              player.game = game_instance
+              game_instance.gamecore.player_connect(client)
+              client.game = game_instance
               game_instance.player_count++
 
               }
@@ -223,15 +222,15 @@
 
             //now if we didn't join a game, we create one
             if (! joined_a_game) {
-              this.create_game(player)
-              this.join_game(player)    // and join it.
+              this.create_game(client)
+              this.join_game(client)    // and join it.
             }
 
           } else {
 
           //no games? create one!
-          this.create_game(player)
-          this.join_game(player)    // and join it.
+          this.create_game(client)
+          this.join_game(client)    // and join it.
         }
       }
 

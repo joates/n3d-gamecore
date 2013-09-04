@@ -1,0 +1,1 @@
+../client/gamecore.common.js

@@ -57,7 +57,7 @@
 
 
   // load the shared player class
-  require('./player.js')
+  var game_player = require('./Player.js')
 
   //  The game_core class
 
@@ -100,8 +100,8 @@
 
   //
 
-      // server side we set the 'game_core' class to a global type, so that it can use it anywhere.
-      if ('undefined' != typeof global) module.exports = global.game_core = game_core
+      require('./gamecore.common.js')(game_core)
+      module.exports = game_core
 
   //
 
@@ -112,6 +112,7 @@
    *  as well as some helpers for rounding numbers to fixed point.
    */
 
+      /**
       // (4.22208334636).fixed(n) will return fixed point value to n places, default n = 3
       Number.prototype.fixed = function(n) { n = n || 3; return parseFloat(this.toFixed(n)) }
       // copies a 2d vector like object from one to another
@@ -128,6 +129,7 @@
       game_core.prototype.lerp = function(p, n, t) { var _t = Number(t); _t = (Math.max(0, Math.min(1, _t))).fixed(); return (p + _t * (n - p)).fixed() }
       // Simple linear interpolation between 2 vectors
       game_core.prototype.v_lerp = function(v, tv, t) { return { x:this.lerp(v.x, tv.x, t), y:this.lerp(v.y, tv.y, t), z:this.lerp(v.z, tv.z, t) } }
+      */
 
 
   /**
@@ -204,6 +206,7 @@
 
   //
 
+      /**
       game_core.prototype.process_input = function(player) {
 
         // It's possible to have recieved multiple inputs by now,
@@ -239,9 +242,11 @@
         // give it back
         return resulting_vector
       }
+      */
 
   //
 
+      /**
       game_core.prototype.physics_movement_vector_from_direction = function(x, y, z) {
 
         // Must be fixed step, at physics sync speed.
@@ -251,6 +256,7 @@
           z: (z * (this.playerspeed * 0.015)).fixed(3)
         }
       }
+      */
 
   //
 
@@ -317,6 +323,7 @@
 
   //
 
+      /**
       game_core.prototype.create_timer = function() {
         setInterval(function() {
           this._dt  = new Date().getTime() - this._dte
@@ -324,9 +331,11 @@
           this.local_time += this._dt / 1000.0
         }.bind(this), 4)
       }
+      */
 
   //
 
+      /**
       game_core.prototype.create_physics_simulation = function() {
         setInterval(function() {
           this._pdt = (new Date().getTime() - this._pdte) / 1000.0
@@ -334,6 +343,7 @@
           this.update_physics()
         }.bind(this), 15)
       }
+      */
 
   //
 

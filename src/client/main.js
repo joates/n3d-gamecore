@@ -2,7 +2,9 @@
   // main.js
   // by joates (Sep-2013)
 
-module.exports = function(game) {
+module.exports = function(game_core) {
+
+  var game = game_core
 
   // Hardcoded dependency on THREE.
   // TODO: this could be handled better.
