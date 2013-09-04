@@ -1,10 +1,6 @@
 
-  /**
-   *  The player class
-   *
-   *  A simple class to maintain state of a player on screen,
-   *  as well as to draw that state when required.
-   */
+  // player.js
+  // by joates (Sep-2013)
 
   var game_player = function(game_instance, player_instance) {
 
@@ -47,7 +43,7 @@
 
   //
 
-  game_player.prototype.render_2d = function(opts) {
+  game_player.prototype.render_2d = function(opts, game) {
     var half_map_width  = game.viewport.width  * 0.5
       , half_map_height = game.viewport.height * 0.5
       , map_scale = 0.11

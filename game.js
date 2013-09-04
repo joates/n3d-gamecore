@@ -2,11 +2,11 @@
   //  game.js
   //  by joates (Aug-2013)
 
-      var game_server = require('./js/registry.js')
+      var game_server = require('./src/server/registry.js')
         , express = require('express')
         , http    = require('http')
         , io      = require('socket.io')
-        , color   = require('./js/ansi-color')
+        , color   = require('./src/server/ansi-color')
         , uuid    = require('node-uuid')
       //, geoip   = require('geoip-lite')
         , app     = express()

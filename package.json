@@ -3,10 +3,7 @@
   "description": "3D multiplayer core functionality game engine component.",
   "author": "joates",
   "license": "MIT",
-  "version": "0.0.2-alpha",
-  "scripts": {
-    "start": "node game.js"
-  },
+  "version": "0.0.3-alpha",
   "repository": {
     "type": "git",
     "url": "git@github.com:joates/n3d-gamecore.git"
@@ -27,9 +24,16 @@
   "dependencies": {
     "express": "3.3.x",
     "socket.io": "0.9.x",
+    "socket.io-browserify": "0.9.x",
     "node-uuid": "1.4.x"
+  },
+  "devDependencies": {
+    "browserify": "2.29.x"
   },
   "engine": {
     "node": "0.10.x"
+  },
+  "scripts": {
+    "start": "browserify src/client/build.js -o public/js/bundle.js && node game.js"
   }
 }

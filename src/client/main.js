@@ -1,17 +1,22 @@
 
-  //  main.js
-  //  by joates (Aug-2013)
+  // main.js
+  // by joates (Sep-2013)
 
-  /**
-   *  Copyright (c) 2012 Sven "FuzzYspo0N" Bergström
-   *  written by : http://underscorediscovery.com
-   *  written for : http://buildnewgames.com/real-time-multiplayer/
-   *
-   *  MIT Licensed.
-   */
+module.exports = function(game) {
 
-  var game = {}
-    , container
+  // Hardcoded dependency on THREE.
+  // TODO: this could be handled better.
+  try {
+    if (! THREE || parseInt(THREE.REVISION) < 60) throw new Error()
+  } catch(err) {
+    console.log(err.stack)
+    err.description =
+      'You need to install the three.js library (r60 or better) and import the <script> ' +
+      'in your index.html file BEFORE the game code <script> (bundle.js).'
+    console.error(err.description)
+  }
+
+  var container
     , camera, scene, renderer
     , WIDTH, HEIGHT
     , scale   = 0.2
@@ -101,13 +106,15 @@
 
   //
 
-  function scene_update(player_set, uuid) {
+  //function scene_update(player_set, uuid) {
+  game.prototype.scene_update = function() {
+    var uuid = this.player_self.uuid
 
-    for (var id in player_set) {
+    for (var id in this.player_set) {
       if (players[id] != undefined && players[id] instanceof THREE.Mesh) {
 
-        if (player_set[id] && ! isNaN(player_set[id].pos.x)) {
-          players[id].position.copy(player_set[id].pos)
+        if (this.player_set[id] && ! isNaN(this.player_set[id].pos.x)) {
+          players[id].position.copy(this.player_set[id].pos)
           // scale down
           players[id].position.multiplyScalar(scale)
         }
@@ -116,7 +123,7 @@
 
     if (players[uuid]) {
       // self color changed ?
-      players[uuid].material.color = new THREE.Color(player_set[uuid].color)
+      players[uuid].material.color = new THREE.Color(this.player_set[uuid].color)
 
       // camera follows our player.
       camera.updateMatrixWorld()
@@ -127,13 +134,14 @@
       camera.position.copy(cameraOffset)
       camera.lookAt(players[uuid].position)
 
-      update_player_heading(uuid)
+      //update_player_heading(uuid)
     }
   }
 
   //
 
-  function scene_get_inputs() {
+  //function scene_get_inputs() {
+  game.prototype.scene_get_inputs = function() {
 
     // process controller coordinates
     cX = controller.deltaX() * 0.016
@@ -152,23 +160,26 @@
 
   //
 
-  function scene_render() {
+  //function scene_render() {
+  game.prototype.scene_render = function() {
     renderer.render(scene, camera)
   }
 
   //
 
-  function scene_add_mesh(p, id) {
+  //function scene_add_mesh(p, id) {
+  game.prototype.scene_add_mesh = function(id) {
     var g = new THREE.CylinderGeometry( 2.6, 3, 2.2, 32, 32, false )
-    var m = new THREE.MeshLambertMaterial({ color: p.color })
+    var m = new THREE.MeshLambertMaterial({ color: this.player_set[id].color })
     players[id] = new THREE.Mesh( g, m )
-    players[id].position.copy(p.pos)
+    players[id].position.copy(this.player_set[id].pos)
     if (scene != undefined) scene.add(players[id])
   }
 
   //
 
-  function scene_remove_mesh(id) {
+  //function scene_remove_mesh(id) {
+  game.prototype.scene_remove_mesh = function(id) {
     scene.remove(players[id])
     delete players[id]
   }
@@ -176,6 +187,8 @@
   //
 
   function update_player_heading(id) {
+    // Note: not used !!
+    /**
     var q = players[id].quaternion
     var pVec = new THREE.Vector3(1, 0, 0).applyQuaternion(q)
 
@@ -187,6 +200,7 @@
     //document.getElementById("heading").innerHTML = heading
     //players[id].heading = heading
     game_core.heading = heading
+    */
   }
 
   //
@@ -223,4 +237,5 @@
     // Start the main game loop.
     game.update(new Date().getTime())
   }
+}
 

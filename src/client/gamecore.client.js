@@ -1,72 +1,19 @@
 
-  //  gamecore.client.js
-  //  by joates (Aug-2013)
+  // gamecore.client.js
+  // by joates (Sep-2013)
 
   /**
-   *  Copyright (c) 2013 Asad Memon
-   *  Forked and updated.
-   *
-   *  MIT Licensed.
-   */
-
-  /**
-   *  Copyright (c) 2012 Sven "FuzzYspo0N" Bergström
-   *  written by : http://underscorediscovery.com
-   *  written for : http://buildnewgames.com/real-time-multiplayer/
-   *
-   *  MIT Licensed.
-   */
-
-  // Note: we have a hard dependency on the Three.js library and
-  //       it includes requestAnimationFrame, so we don't need this..
-
-  /**
-  //  The main update loop runs on requestAnimationFrame,
-  //  Which falls back to a setTimeout loop on the server
-  //  Code below is from Three.js, and sourced from links below
-
-  //  http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-  //  http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-
-  //  requestAnimationFrame polyfill by Erik Möller
-  //  fixes from Paul Irish and Tino Zijdel
-
-  var frame_time = 60 / 1000  // run the local game at 16ms/ 60hz
-  if ('undefined' != typeof(global)) frame_time = 45  //on server we run at 45ms, 22hz
-
-  ;(function() {
-
-    var lastTime = 0
-    var vendors = [ 'ms', 'moz', 'webkit', 'o' ]
-
-    for (var x=0; x<vendors.length && ! window.requestAnimationFrame; ++x) {
-      window.requestAnimationFrame = window[ vendors[x] + 'RequestAnimationFrame' ]
-      window.cancelAnimationFrame = window[ vendors[x] + 'CancelAnimationFrame' ] || window[ vendors[x] + 'CancelRequestAnimationFrame' ]
-    }
-
-    if (! window.requestAnimationFrame) {
-      window.requestAnimationFrame = function (callback, element) {
-        var currTime = Date.now(), timeToCall = Math.max(0, frame_time - (currTime - lastTime))
-        var id = window.setTimeout(function() { callback(currTime + timeToCall) }, timeToCall)
-        lastTime = currTime + timeToCall
-        return id
-      }
-    }
-
-    if (! window.cancelAnimationFrame) {
-      window.cancelAnimationFrame = function (id) { clearTimeout(id) }
-    }
-
-  }() )
+  var EventEmitter = require('events').EventEmitter
+    , util     = require('util')
+    , domready = require('domready')
+    , Player   = require('./player.js')
   */
 
+  var io = require('socket.io-browserify')
 
-  //  The game_core class
+  function game_core() {
 
-      var game_core = function() {
-
-        // TODO: collisions are not implemented yet !
-        //this.world = { width:800, height:800, depth:800 }
+        //EventEmitter.call(this)
 
         // this object initializes to the client player.
         this.player_self = new game_player(this)
@@ -451,7 +398,7 @@
         // at some point we may need to cleanup player_set
         // removing out-of-range players with no recent updates.
         this.playercount--
-        scene_remove_mesh(id)
+        this.scene_remove_mesh(id)
         delete this.player_set[id]
         console.log('Player quit: ' + this.playercount + ' remaining')
       }
@@ -475,7 +422,7 @@
         }
 
         // add player mesh into 3d scene.
-        scene_add_mesh(this.player_set[id], id)
+        this.scene_add_mesh(id)
         console.log('Player joined: ' + this.playercount + ' total')
       }
 
@@ -645,7 +592,7 @@
         // Check for client movement (if any).
         // Values are transmitted to the server and also
         // stored locally and get processed on next physics tick.
-        var input_coords = scene_get_inputs()
+        var input_coords = this.scene_get_inputs()
         if (input_coords) this.client_handle_input(input_coords)
 
         // Set actual player positions from the server update.
@@ -655,9 +602,9 @@
         this.client_update_local_position()
 
         // Update player locations in the 3D scene.
-        scene_update(this.player_set, this.player_self.uuid)
+        this.scene_update(this.player_set, this.player_self.uuid)
 
-        if (this.show_3D) scene_render()
+        if (this.show_3D) this.scene_render()
 
         if (this.show_2D) {
 
@@ -678,16 +625,16 @@
 
               // destination ghost?
               if (this.show_dest_pos && !this.naive_approach) {
-                this.player_set[id].render_2d({ lerp: true, pos: map_offset_pos })
+                this.player_set[id].render_2d({ lerp: true, pos: map_offset_pos }, this)
               }
 
               // server ghost?
               if (this.show_server_pos && ! this.naive_approach) {
-                this.player_set[id].render_2d({ ghost: true, pos: map_offset_pos })
+                this.player_set[id].render_2d({ ghost: true, pos: map_offset_pos }, this)
               }
 
               // player
-              this.player_set[id].render_2d({ player: true, pos: map_offset_pos })
+              this.player_set[id].render_2d({ player: true, pos: map_offset_pos }, this)
             }
           }
         }
