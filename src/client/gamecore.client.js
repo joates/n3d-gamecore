@@ -14,46 +14,25 @@
   function game_core() {
     EventEmitter.call(this)
 
-    // this object initializes to the client player.
     this.player_self = new Player(this)
-
-    // storage of all active players (within range)
-    this.player_set = {}
-
-    // The speed at which the clients move.
+    this.player_set  = {}
     this.playerspeed = 90
     this.playercount = 0
-
-    // Set up some physics integration values
-    this._pdt  = 0.0001                 //The physics update delta time
-    this._pdte = new Date().getTime()   //The physics update last delta time
-    // A local timer for precision on server and client
-    this.local_time = 0.016             //The local timer
-    this._dt  = new Date().getTime()    //The local timer delta
-    this._dte = new Date().getTime()    //The local timer last frame time
-
-    // Start a physics loop, this is separate to the rendering
-    // as this happens at a fixed frequency
-    this.create_physics_simulation()
-
-    // Start a fast paced timer for measuring time easier
-    this.create_timer()
-
-    // Create the default configuration settings
-    this.client_create_configuration()
-
-    // A list of recent server updates we interpolate across
-    // This is the buffer that is the driving factor for our networking
     this.server_updates = []
+
+    this._pdt  = 0.0001
+    this._pdte = new Date().getTime()
+    this.local_time = 0.016
+    this._dt  = new Date().getTime()
+    this._dte = new Date().getTime()
+
+    this.create_physics_simulation()
+    this.create_timer()
+    this.client_create_configuration()
 
     //Connect to the socket.io server!
     this.client_connect_to_server()
-
-    // We start pinging the server to determine latency
     this.client_create_ping_timer()
-
-    // initial color choice for the client player.
-    this.color = '#eebf00'
 
     // Make this only if requested
     if (String(window.location).indexOf('debug') != -1) {
@@ -71,8 +50,8 @@
     this.show_2D = false
     this.show_3D = true
     this.heading = 0
+    this.color   = '#eebf00'
 
-    //this.show_help = false          // Whether or not to draw the help text
     this.naive_approach = false     // Whether or not to use the naive approach
     this.show_server_pos = false    // Whether or not to show the server position
     this.show_dest_pos = false      // Whether or not to show the interpolation goal
@@ -181,7 +160,6 @@
 
     var _debugsettings = this.gui.addFolder('Debug view')
         
-    //_debugsettings.add(this, 'show_help').listen()
     _debugsettings.add(this, 'fps_avg').listen()
     _debugsettings.add(this, 'show_server_pos').listen()
     _debugsettings.add(this, 'show_dest_pos').listen()
@@ -206,7 +184,6 @@
     _netsettings.add(this, 'net_offset').min(0.01).step(0.001).listen()
     _netsettings.add(this, 'server_time').step(0.001).listen()
     _netsettings.add(this, 'client_time').step(0.001).listen()
-    //_netsettings.add(this, 'oldest_tick').step(0.001).listen()
 
     _netsettings.open()
   }

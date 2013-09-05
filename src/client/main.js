@@ -165,6 +165,8 @@ module.exports = function(game_core) {
   //function scene_render() {
   game.prototype.scene_render = function() {
     renderer.render(scene, camera)
+
+    this.emit('render')
   }
 
   //
@@ -225,6 +227,18 @@ module.exports = function(game_core) {
     // Create a game instance.
     game = new game_core()
 
+    game.on('init', function() {
+      console.log('[init] event fired: ' + game.local_time)
+    })
+
+    game.on('update', function() {
+      console.log('[update] event fired: ' + game.local_time)
+    })
+
+    game.on('render', function() {
+      //console.log('[render] event fired: ' + game.local_time)
+    })
+
     // 2D viewport. (i.e. map)
     game.viewport = document.getElementById('viewport')
 		game.viewport.width  = window.innerWidth * 0.25 - 20
@@ -235,6 +249,8 @@ module.exports = function(game_core) {
     // 3D scene.
     game.scene = document.getElementById('container')
     scene_init()
+
+    game.emit('init')
 
     // Start the main game loop.
     game.update(new Date().getTime())
