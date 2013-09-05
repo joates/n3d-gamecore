@@ -26,7 +26,8 @@
     "socket.io": "0.9.x",
     "socket.io-browserify": "0.9.x",
     "domready": "0.2.x",
-    "node-uuid": "1.4.x"
+    "node-uuid": "1.4.x",
+    "n3d-controller": "0.0.x"
   },
   "devDependencies": {
     "browserify": "2.29.x"
@@ -35,6 +36,6 @@
     "node": "0.10.x"
   },
   "scripts": {
-    "start": "browserify src/client/build.js -o public/js/bundle.js && node game.js"
+    "start": "browserify src/client/main.js -o public/js/bundle.js && node game.js"
   }
 }

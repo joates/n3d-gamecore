@@ -12,12 +12,15 @@
     , Player = require('./Player.js')
     , controller = require('n3d-controller')
 
+  /**
   var container
     , camera, scene, renderer
     , WIDTH, HEIGHT
     , scale   = 0.2
     , players = {}
-    , golden_ratio = 1.6180339887
+  */
+
+  var golden_ratio = 1.6180339887
 
 
   function game_core() {
@@ -50,11 +53,7 @@
     game.client_connect_to_server()
     game.client_create_ping_timer()
 
-    // Start the game loop.
-    game.update(new Date().getTime())
-
-    setTimeout(function() {
-      domready(function() {
+    setTimeout(function() { domready(function() {
 
         // Make this only if requested
         if (String(window.location).indexOf('debug') != -1) {
@@ -68,9 +67,15 @@
         game.ctx = game.viewport.getContext('2d')
         game.ctx.font = '11px "Helvetica"'
 
+        // 3D scene container.
+        game.scene = document.getElementById('container')
+
         game.emit('init')
-      })
-    }, 0)
+
+        // Start the game loop.
+        game.update(new Date().getTime())
+
+    })}, 0)
 
     return game
   }
@@ -236,7 +241,7 @@
     // Update the game specifics
     this.client_update()
 
-    this.emit('update', this)
+    this.emit('update')
 
     // schedule the next update
     this.updateid = requestAnimationFrame(this.update.bind(this), this.viewport)
@@ -382,7 +387,6 @@
     // Values are transmitted to the server and also
     // stored locally and get processed on next physics tick.
 
-// >>>>>>>>
     var input_coords = this.scene_get_inputs()
     if (input_coords) this.client_handle_input(input_coords)
 
@@ -392,11 +396,7 @@
     }
     this.client_update_local_position()
 
-    // Update player locations in the 3D scene.
-    //this.scene_update()
-
-    //if (this.show_3D) this.scene_render()
-    this.emit('render')
+    if (this.show_3D) this.emit('render')
 
     if (this.show_2D) {
       // need the client players current position to use
@@ -590,7 +590,6 @@
     // Note: at some point we may need to cleanup player_set
     // removing out-of-range players with no recent updates.
     this.playercount--
-    //this.scene_remove_mesh(id)
     this.emit('remove_mesh', id)
     delete this.player_set[id]
     console.log('Player quit: ' + this.playercount + ' remaining')
@@ -614,7 +613,6 @@
     }
 
     // add player mesh into 3d scene.
-    //this.scene_add_mesh(id)
     this.emit('add_mesh', id, this)
     console.log('Player joined: ' + this.playercount + ' total')
   }
