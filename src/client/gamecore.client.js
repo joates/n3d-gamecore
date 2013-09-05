@@ -532,19 +532,8 @@
       , subcommand  = commands[1] || null
       , commanddata = commands[2] || null
 
-    switch (command) {
-      case 's': //server message
-
-        switch (subcommand) {
-          //case 'e' : //end game requested
-          //  this.client_ondisconnect(commanddata); break
-
-          case 'p' : //server ping
-            this.client_onping(commanddata); break
-        }
-
-      break
-    }
+    if (command === 's' && subcommand === 'p')
+      this.client_onping(commanddata)
   }
 
 
@@ -564,7 +553,7 @@
 
 
   game_core.prototype.remove_player = function(id) {
-    // at some point we may need to cleanup player_set
+    // Note: at some point we may need to cleanup player_set
     // removing out-of-range players with no recent updates.
     this.playercount--
     this.scene_remove_mesh(id)
