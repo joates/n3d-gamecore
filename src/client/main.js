@@ -2,9 +2,9 @@
   // main.js
   // by joates (Sep-2013)
 
-module.exports = function(game_core) {
+module.exports = function() {
 
-  var game = game_core
+  var createGame = require('./gamecore.client.js')
 
   // Hardcoded dependency on THREE.
   // TODO: this could be handled better.
@@ -108,15 +108,16 @@ module.exports = function(game_core) {
 
   //
 
-  //function scene_update(player_set, uuid) {
-  game.prototype.scene_update = function() {
-    var uuid = this.player_self.uuid
+  function scene_update(game_core) {
+  //createGame.prototype.scene_update = function() {
+    var self = game_core
+      , uuid = self.player_self.uuid
 
-    for (var id in this.player_set) {
+    for (var id in self.player_set) {
       if (players[id] != undefined && players[id] instanceof THREE.Mesh) {
 
-        if (this.player_set[id] && ! isNaN(this.player_set[id].pos.x)) {
-          players[id].position.copy(this.player_set[id].pos)
+        if (self.player_set[id] && ! isNaN(self.player_set[id].pos.x)) {
+          players[id].position.copy(self.player_set[id].pos)
           // scale down
           players[id].position.multiplyScalar(scale)
         }
@@ -125,7 +126,7 @@ module.exports = function(game_core) {
 
     if (players[uuid]) {
       // self color changed ?
-      players[uuid].material.color = new THREE.Color(this.player_set[uuid].color)
+      players[uuid].material.color = new THREE.Color(self.player_set[uuid].color)
 
       // camera follows our player.
       camera.updateMatrixWorld()
@@ -143,7 +144,7 @@ module.exports = function(game_core) {
   //
 
   //function scene_get_inputs() {
-  game.prototype.scene_get_inputs = function() {
+  createGame.prototype.scene_get_inputs = function() {
 
     // process controller coordinates
     cX = controller.deltaX() * 0.016
@@ -162,28 +163,26 @@ module.exports = function(game_core) {
 
   //
 
-  //function scene_render() {
-  game.prototype.scene_render = function() {
+  function scene_render() {
+  //createGame.prototype.scene_render = function() {
     renderer.render(scene, camera)
-
-    this.emit('render')
   }
 
   //
 
-  //function scene_add_mesh(p, id) {
-  game.prototype.scene_add_mesh = function(id) {
+  function scene_add_mesh(id, game) {
+  //createGame.prototype.scene_add_mesh = function(id) {
     var g = new THREE.CylinderGeometry( 2.6, 3, 2.2, 32, 32, false )
-    var m = new THREE.MeshLambertMaterial({ color: this.player_set[id].color })
+    var m = new THREE.MeshLambertMaterial({ color: game.player_set[id].color })
     players[id] = new THREE.Mesh( g, m )
-    players[id].position.copy(this.player_set[id].pos)
+    players[id].position.copy(game.player_set[id].pos)
     if (scene != undefined) scene.add(players[id])
   }
 
   //
 
-  //function scene_remove_mesh(id) {
-  game.prototype.scene_remove_mesh = function(id) {
+  function scene_remove_mesh(id) {
+  //createGame.prototype.scene_remove_mesh = function(id) {
     scene.remove(players[id])
     delete players[id]
   }
@@ -224,6 +223,8 @@ module.exports = function(game_core) {
   //
 
   window.onload = function() {
+
+    /**
     // Create a game instance.
     game = new game_core()
 
@@ -251,9 +252,36 @@ module.exports = function(game_core) {
     scene_init()
 
     game.emit('init')
+    */
 
-    // Start the main game loop.
-    game.update(new Date().getTime())
+    // Create the game instance.
+    game = new createGame()
+
+    // Register event listeners.
+    game.on('init', function() {
+      console.log('[init] event fired: ' + game.local_time)
+      scene_init()
+    })
+
+    game.on('update', function(g) {
+      //console.log('[update] event fired: ' + game.local_time)
+      scene_update(g)
+    })
+
+    game.on('render', function() {
+      //console.log('[render] event fired: ' + game.local_time)
+      scene_render()
+    })
+
+    game.on('add_mesh', function(id, g) {
+      console.log('[add_mesh] event fired: ' + game.local_time)
+      scene_add_mesh(id, g)
+    })
+
+    game.on('remove_mesh', function(id) {
+      console.log('[remove_mesh] event fired: ' + game.local_time)
+      scene_remove_mesh(id)
+    })
   }
 }
 

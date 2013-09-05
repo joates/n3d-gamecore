@@ -6,9 +6,18 @@
   /******** I N I T ********/
 
   var EventEmitter = require('events').EventEmitter
+    , domready = require('domready')
     , util   = require('util')
     , io     = require('socket.io-browserify')
     , Player = require('./Player.js')
+
+  var container
+    , camera, scene, renderer
+    , WIDTH, HEIGHT
+    , scale   = 0.2
+    , players = {}
+    , controller
+    , golden_ratio = 1.6180339887
 
 
   function game_core() {
@@ -25,25 +34,49 @@
     this.local_time = 0.016
     this._dt  = new Date().getTime()
     this._dte = new Date().getTime()
+  }
 
-    this.create_physics_simulation()
-    this.create_timer()
-    this.client_create_configuration()
+
+  function createGame() {
+    var game = new game_core()
+
+    game.create_physics_simulation()
+    game.create_timer()
+    game.client_create_configuration()
 
     //Connect to the socket.io server!
-    this.client_connect_to_server()
-    this.client_create_ping_timer()
+    game.client_connect_to_server()
+    game.client_create_ping_timer()
 
-    // Make this only if requested
-    if (String(window.location).indexOf('debug') != -1) {
-      this.client_create_debug_gui()
-    }
+    // Start the game loop.
+    game.update(new Date().getTime())
+
+    setTimeout(function() {
+      domready(function() {
+
+        // Make this only if requested
+        if (String(window.location).indexOf('debug') != -1) {
+          game.client_create_debug_gui()
+        }
+
+        // 2D viewport. (i.e. map)
+        game.viewport = document.getElementById('viewport')
+    		game.viewport.width  = window.innerWidth * 0.25 - 20
+    		game.viewport.height = game.viewport.width / golden_ratio
+        game.ctx = game.viewport.getContext('2d')
+        game.ctx.font = '11px "Helvetica"'
+
+        game.emit('init')
+      })
+    }, 0)
+
+    return game
   }
 
 
   util.inherits(game_core, EventEmitter)
   require('./gamecore.common.js')(game_core)
-  module.exports = game_core
+  module.exports = createGame
 
 
   game_core.prototype.client_create_configuration = function() {
@@ -201,6 +234,8 @@
     // Update the game specifics
     this.client_update()
 
+    this.emit('update', this)
+
     // schedule the next update
     this.updateid = requestAnimationFrame(this.update.bind(this), this.viewport)
   }
@@ -327,8 +362,10 @@
     // Check for client movement (if any).
     // Values are transmitted to the server and also
     // stored locally and get processed on next physics tick.
-    var input_coords = this.scene_get_inputs()
-    if (input_coords) this.client_handle_input(input_coords)
+
+// >>>>>>>>
+    //var input_coords = this.scene_get_inputs()
+    //if (input_coords) this.client_handle_input(input_coords)
 
     // Set actual player positions from the server update.
     if (! this.naive_approach) {
@@ -337,9 +374,10 @@
     this.client_update_local_position()
 
     // Update player locations in the 3D scene.
-    this.scene_update()
+    //this.scene_update()
 
-    if (this.show_3D) this.scene_render()
+    //if (this.show_3D) this.scene_render()
+    this.emit('render')
 
     if (this.show_2D) {
       // need the client players current position to use
@@ -533,7 +571,8 @@
     // Note: at some point we may need to cleanup player_set
     // removing out-of-range players with no recent updates.
     this.playercount--
-    this.scene_remove_mesh(id)
+    //this.scene_remove_mesh(id)
+    this.emit('remove_mesh', id)
     delete this.player_set[id]
     console.log('Player quit: ' + this.playercount + ' remaining')
   }
@@ -556,7 +595,8 @@
     }
 
     // add player mesh into 3d scene.
-    this.scene_add_mesh(id)
+    //this.scene_add_mesh(id)
+    this.emit('add_mesh', id, this)
     console.log('Player joined: ' + this.playercount + ' total')
   }
 
