@@ -10,13 +10,13 @@
     , util   = require('util')
     , io     = require('socket.io-browserify')
     , Player = require('./Player.js')
+    , controller = require('n3d-controller')
 
   var container
     , camera, scene, renderer
     , WIDTH, HEIGHT
     , scale   = 0.2
     , players = {}
-    , controller
     , golden_ratio = 1.6180339887
 
 
@@ -39,6 +39,8 @@
 
   function createGame() {
     var game = new game_core()
+
+    game.controller = new Controller({ mouseSupport: false, strokeStyle: '#FFFF00' })
 
     game.create_physics_simulation()
     game.create_timer()
@@ -246,6 +248,23 @@
   }
 
 
+  game_core.prototype.scene_get_inputs = function() {
+
+    // process controller coordinates
+    cX = this.controller.deltaX() * 0.016
+    cZ = this.controller.deltaY() * 0.016
+
+    // ignore smaller controller movements,
+    // and avoid the additional calculations that follow..
+    if ((cX > -0.1 && cX < 0.1) && (cZ > -0.1 && cZ < 0.1)) return
+
+    // clamp the values (i.e. max velocity)
+    cX = Math.min(Math.max(cX, -3), 3)
+    cZ = Math.min(Math.max(cZ, -3), 3)
+
+    return { x:cX, y:0, z:cZ }
+  }
+
   game_core.prototype.client_onserverupdate_received = function(data) {
     this.server_time = data.t
     this.client_time = this.server_time - (this.net_offset / 1000)
@@ -364,8 +383,8 @@
     // stored locally and get processed on next physics tick.
 
 // >>>>>>>>
-    //var input_coords = this.scene_get_inputs()
-    //if (input_coords) this.client_handle_input(input_coords)
+    var input_coords = this.scene_get_inputs()
+    if (input_coords) this.client_handle_input(input_coords)
 
     // Set actual player positions from the server update.
     if (! this.naive_approach) {

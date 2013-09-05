@@ -23,7 +23,7 @@ module.exports = function() {
     , WIDTH, HEIGHT
     , scale   = 0.2
     , players = {}
-    , controller
+  //, controller
     , golden_ratio = 1.6180339887
 
   //
@@ -35,7 +35,7 @@ module.exports = function() {
     scene = new THREE.Scene()
     scene.fog = new THREE.Fog(0x111133, 0, 300);
 
-    controller = new Controller({ mouseSupport: false, strokeStyle: '#FFFF00' })
+  //controller = new Controller({ mouseSupport: false, strokeStyle: '#FFFF00' })
 
     camera = new THREE.PerspectiveCamera(40, WIDTH / HEIGHT, 0.1, 10000)
     camera.position.set(0, 20, 60)
@@ -143,6 +143,7 @@ module.exports = function() {
 
   //
 
+  /**
   //function scene_get_inputs() {
   createGame.prototype.scene_get_inputs = function() {
 
@@ -160,6 +161,7 @@ module.exports = function() {
 
     return { x:cX, y:0, z:cZ }
   }
+  */
 
   //
 
