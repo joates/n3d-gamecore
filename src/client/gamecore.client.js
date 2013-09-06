@@ -40,10 +40,9 @@
   }
 
 
-  function createGame() {
-    var game = new game_core()
-
-    game.controller = new Controller({ mouseSupport: false, strokeStyle: '#FFFF00' })
+  function createGame(opts) {
+    var opts = opts || {}
+      , game = new game_core()
 
     game.create_physics_simulation()
     game.create_timer()
@@ -67,8 +66,26 @@
         game.ctx = game.viewport.getContext('2d')
         game.ctx.font = '11px "Helvetica"'
 
-        // 3D scene container.
-        game.scene = document.getElementById('container')
+        if (opts.el) {
+          game.scene = opts.el
+        } else {
+          // create a default rendering context.
+          var canvas = document.createElement("canvas")
+          canvas.setAttribute('width',  window.innerWidth)
+          canvas.setAttribute('height', window.innerHeight)
+          canvas.style.background = '#306090'
+
+          // 3D scene container.
+          game.scene = document.getElementById('container')
+          game.scene.appendChild(canvas)
+        }
+
+        // touch controller.
+        game.controller = new Controller({
+          container: game.scene,
+          mouseSupport: false,
+          strokeStyle: '#FFFF00'
+        })
 
         game.emit('init')
 

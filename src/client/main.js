@@ -15,13 +15,22 @@
   }
 
   var Game = require('./gamecore.client.js')
-    , camera, scene, renderer
-    , WIDTH, HEIGHT
+    , renderer
+    , scene
+    , camera
+    , WIDTH
+    , HEIGHT
     , scale   = 0.2
     , players = {}
     , golden_ratio = 1.6180339887
 
-  function scene_init(game) {
+  function scene_init(game_core) {
+    // called AFTER gamecore has initialized
+    // Note: gamecore already has a rendering context and 
+    //       the game loop is updating and rendering at 60hz.
+  }
+
+  function create_3d_context() {
     WIDTH  = window.innerWidth
     HEIGHT = window.innerHeight
 
@@ -91,10 +100,13 @@
     renderer.setClearColor(scene.fog.color, 1);
 
     // store the 3D rendering context in the game object.
-    game.scene.appendChild(renderer.domElement)
+    var container = document.getElementById('container')
+    container.appendChild(renderer.domElement)
 
     // events.
     window.addEventListener('resize', onWindowResize, false)
+
+    return container
   }
 
   function scene_update(game_core) {
@@ -157,7 +169,8 @@
   }
 
   window.onload = function() {
-    game = new Game()  // Create the game instance.
+    var context = create_3d_context()  // rendering context.
+    game = new Game({ el: context })   // game instance.
 
     // Register event listeners.
     game.on('init',   function() { scene_init(game) })
