@@ -2,8 +2,7 @@
   // main.js
   // by joates (Sep-2013)
 
-  // Hardcoded dependency on THREE.
-  // TODO: this could be handled better.
+  // Hardcoded dependency on THREE (https://github.com/mrdoob/three.js)
   try {
     if (! THREE || parseInt(THREE.REVISION) < 60) throw new Error()
   } catch(err) {
@@ -14,7 +13,7 @@
     console.error(err.description)
   }
 
-  var Game = require('./gamecore.client.js')
+  var Game = require('./gamecore.js')
     , renderer
     , scene
     , camera
@@ -26,8 +25,9 @@
 
   function scene_init(game_core) {
     // called AFTER gamecore has initialized
+
     // Note: gamecore already has a rendering context and 
-    //       the game loop is updating and rendering at 60hz.
+    // the game loop is updating and rendering at 60hz.
   }
 
   function create_3d_context() {

@@ -1,27 +1,23 @@
 
-  // gamecore.client.js
+  // gamecore.js
   // by joates (Sep-2013)
 
-
-  /******** I N I T ********/
+  /**
+   *  Copyright (c) 2012 Sven "FuzzYspo0N" Bergström
+   *  written by:  http://underscorediscovery.com
+   *  written for: http://buildnewgames.com/real-time-multiplayer/
+   *
+   *  MIT Licensed.
+   */
 
   var EventEmitter = require('events').EventEmitter
     , domready = require('domready')
     , util   = require('util')
     , io     = require('socket.io-browserify')
     , Player = require('./Player.js')
-    , controller = require('n3d-controller')
+    , golden_ratio = 1.6180339887
 
-  /**
-  var container
-    , camera, scene, renderer
-    , WIDTH, HEIGHT
-    , scale   = 0.2
-    , players = {}
-  */
-
-  var golden_ratio = 1.6180339887
-
+  require('n3d-controller')
 
   function game_core() {
     EventEmitter.call(this)
@@ -38,7 +34,6 @@
     this._dt  = new Date().getTime()
     this._dte = new Date().getTime()
   }
-
 
   function createGame(opts) {
     var opts = opts || {}
@@ -97,11 +92,9 @@
     return game
   }
 
-
   util.inherits(game_core, EventEmitter)
-  require('./gamecore.common.js')(game_core)
+  require('./common.js')(game_core)
   module.exports = createGame
-
 
   game_core.prototype.client_create_configuration = function() {
     this.show_2D = false
@@ -141,7 +134,6 @@
     this.llt = new Date().getTime()
   }
 
-
   game_core.prototype.client_connect_to_server = function() {
     // Store a local reference to our connection to the server
     this.socket = io.connect()
@@ -162,17 +154,14 @@
     this.socket.on('message', this.client_onnetmessage.bind(this))
   }
 
-
   game_core.prototype.client_ondisconnect = function(data) {
     // Perform any cleanup required when we disconnect.
   }
-
 
   game_core.prototype.client_onconnected = function(data) {
     // The server responded with our unique identity.
     this.player_self.uuid = data.id
   }
-
 
   game_core.prototype.client_create_ping_timer = function() {
     // Set a ping timer to 1 second, to maintain the ping/latency between
@@ -183,7 +172,6 @@
       this.socket.send('p.' + (this.last_ping_time))
     }.bind(this), 1000)
   }
-
 
   game_core.prototype.client_create_debug_gui = function() {
     this.gui = new dat.GUI({ width: 200 })
@@ -245,30 +233,21 @@
     _netsettings.open()
   }
 
-
-  /********  U P D A T E  ********/
-
   game_core.prototype.update = function(t) {
-    // Work out the delta time
+    // delta time
     this.dt = this.lastframetime ? ((t - this.lastframetime) / 1000.0).fixed() : 0.016
 
-    // Store the last frame time
     this.lastframetime = t
-
-    // Update the game specifics
     this.client_update()
-
     this.emit('update')
 
     // schedule the next update
     this.updateid = requestAnimationFrame(this.update.bind(this), this.viewport)
   }
 
-
   game_core.prototype.check_collision = function(player) {
     // TODO: collisions not implemented yet !
   }
-
 
   game_core.prototype.scene_get_inputs = function() {
 
@@ -324,7 +303,6 @@
     }
   }
 
-
   game_core.prototype.client_process_net_prediction_correction = function() {
     // No updates...
     if (! this.server_updates.length) return
@@ -368,7 +346,6 @@
     }
   }
 
-
   game_core.prototype.update_physics = function() {
     if (this.client_predict) {
       this.player_self.old_state.pos = this.pos(this.player_self.cur_state.pos)
@@ -377,7 +354,6 @@
       this.player_self.state_time = this.local_time
     }
   }
-
 
   game_core.prototype.client_update_local_position = function() {
     if (this.client_predict) {
@@ -393,11 +369,10 @@
       this.player_self.pos = current_state
 
       // TODO: collisions are not implemented yet !
-      //We handle collision on client if predicting.
+      // We handle collision on client if predicting.
       //this.check_collision( this.player_self )
     }
   }
-
 
   game_core.prototype.client_update = function() {
     // Check for client movement (if any).
@@ -451,7 +426,6 @@
     // Work out the fps average
     this.client_refresh_fps()
   }
-
 
   game_core.prototype.client_process_net_updates = function() {
     // No updates...
@@ -565,17 +539,10 @@
     }
   }
 
-
-  /********  R E N D E R  ********/
-
-
-  /********  U T I L S  ********/
-
   game_core.prototype.client_onping = function(data) {
     this.net_ping = new Date().getTime() - parseFloat(data)
     this.net_latency = this.net_ping / 2
   }
-
 
   game_core.prototype.client_onnetmessage = function(data) {
     var commands = data.split('.')
@@ -586,7 +553,6 @@
     if (command === 's' && subcommand === 'p')
       this.client_onping(commanddata)
   }
-
 
   game_core.prototype.client_refresh_fps = function() {
     // We store the fps for 10 frames, by adding it to this accumulator
@@ -602,7 +568,6 @@
     }
   }
 
-
   game_core.prototype.remove_player = function(id) {
     // Note: at some point we may need to cleanup player_set
     // removing out-of-range players with no recent updates.
@@ -612,9 +577,8 @@
     console.log('Player quit: ' + this.playercount + ' remaining')
   }
 
-
   game_core.prototype.add_player = function(id, pos, idx) {
-    // need player to exist so we can apply the update.
+    // player must exist so that we can apply the update.
     this.playercount++
     this.player_set[id] = new Player(this)
     this.player_set[id].cur_state = pos
@@ -633,7 +597,6 @@
     this.emit('add_mesh', id, this)
     console.log('Player joined: ' + this.playercount + ' total')
   }
-
 
   game_core.prototype.client_handle_input = function(inpt) {
     // This takes input from the client and keeps a record,
@@ -676,4 +639,3 @@
       return { x:0, y:0, z:0 }
     }
   }
-

@@ -1,1 +1,1 @@
-../client/gamecore.common.js
+../client/common.js
