@@ -36,6 +36,6 @@
     "node": "0.10.x"
   },
   "scripts": {
-    "start": "browserify src/client/main.js -o public/js/bundle.js && node game.js"
+    "start": "browserify src/client/main.js -o public/bundle.js && node game.js"
   }
 }
