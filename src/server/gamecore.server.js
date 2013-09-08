@@ -57,7 +57,7 @@
 
 
   // load the shared player class
-  var game_player = require('./Player.js')
+  var game_player = require('../client/Player.js')
 
   //  The game_core class
 
@@ -100,7 +100,7 @@
 
   //
 
-      require('./gamecore.common.js')(game_core)
+      require('../client/common.js')(game_core)
       module.exports = game_core
 
   //

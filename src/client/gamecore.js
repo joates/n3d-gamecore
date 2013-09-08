@@ -19,22 +19,6 @@
 
   require('n3d-controller')
 
-  function game_core() {
-    EventEmitter.call(this)
-
-    this.player_self = new Player(this)
-    this.player_set  = {}
-    this.playerspeed = 90
-    this.playercount = 0
-    this.server_updates = []
-
-    this._pdt  = 0.0001
-    this._pdte = new Date().getTime()
-    this.local_time = 0.016
-    this._dt  = new Date().getTime()
-    this._dte = new Date().getTime()
-  }
-
   function createGame(opts) {
     var opts = opts || {}
       , game = new game_core()
@@ -90,6 +74,22 @@
     })}, 0)
 
     return game
+  }
+
+  function game_core() {
+    EventEmitter.call(this)
+
+    this.player_self = new Player(this)
+    this.player_set  = {}
+    this.playerspeed = 90
+    this.playercount = 0
+    this.server_updates = []
+
+    this._pdt  = 0.0001
+    this._pdte = new Date().getTime()
+    this.local_time = 0.016
+    this._dt  = new Date().getTime()
+    this._dte = new Date().getTime()
   }
 
   util.inherits(game_core, EventEmitter)
