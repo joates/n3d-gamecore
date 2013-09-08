@@ -68,7 +68,7 @@
           var canvas = document.createElement("canvas")
           canvas.setAttribute('width',  window.innerWidth)
           canvas.setAttribute('height', window.innerHeight)
-          canvas.style.background = '#306090'
+          document.body.style.background = '#101010'
 
           // 3D scene container.
           game.scene = document.getElementById('container')
@@ -190,7 +190,7 @@
     }.bind(this))
 
     _playersettings.add(this, 'show_3D').onChange(function(value) {
-      this.scene.style.visibility = value ? 'visible' : 'hidden'
+      this.scene.firstChild.style.visibility = value ? 'visible' : 'hidden'
     }.bind(this))
 
     _playersettings.add(this, 'heading').listen()
