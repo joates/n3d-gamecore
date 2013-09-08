@@ -78,7 +78,7 @@
         // touch controller.
         game.controller = new Controller({
           container: game.scene,
-          mouseSupport: false,
+          mouseSupport: ('createTouch' in document ? false : true),
           strokeStyle: '#FFFF00'
         })
 
