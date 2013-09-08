@@ -23,9 +23,8 @@
     , players = {}
     , golden_ratio = 1.6180339887
 
-  function scene_init(game_core) {
+  function scene_init() {
     // called AFTER gamecore has initialized
-
     // Note: gamecore already has a rendering context and 
     // the game loop is updating and rendering at 60hz.
   }
@@ -113,29 +112,21 @@
     var game = game_core
       , uuid = game.player_self.uuid
 
-    for (var id in game.player_set) {
-      if (players[id] != undefined && players[id] instanceof THREE.Mesh) {
+    for (var id in players) {
+      players[id].position.copy(game.player_set[id].pos)
+      players[id].position.multiplyScalar(scale)      // scale down
 
-        if (game.player_set[id] && ! isNaN(game.player_set[id].pos.x)) {
-          players[id].position.copy(game.player_set[id].pos)
-          // scale down
-          players[id].position.multiplyScalar(scale)
-        }
+      if (id === uuid) {
+        // self color changed ?
+        players[id].material.color = new THREE.Color(game.player_set[uuid].color)
+
+        // camera follows our player.
+        camera.updateMatrixWorld()
+        var relativeCameraOffset = new THREE.Vector3(0, 20, 60)
+        var cameraOffset = relativeCameraOffset.applyMatrix4(players[id].matrixWorld)
+        camera.position.copy(cameraOffset)
+        camera.lookAt(players[id].position)
       }
-    }
-
-    if (players[uuid]) {
-      // self color changed ?
-      players[uuid].material.color = new THREE.Color(game.player_set[uuid].color)
-
-      // camera follows our player.
-      camera.updateMatrixWorld()
-      var relativeCameraOffset = new THREE.Vector3(0, 20, 60)
-
-      var cameraOffset = relativeCameraOffset.applyMatrix4(players[uuid].matrixWorld)
-
-      camera.position.copy(cameraOffset)
-      camera.lookAt(players[uuid].position)
     }
   }
 
@@ -143,12 +134,12 @@
     renderer.render(scene, camera)
   }
 
-  function scene_add_mesh(id, game) {
-    var g = new THREE.CylinderGeometry(2.6, 3, 2.2, 32, 32, false)
-    var m = new THREE.MeshLambertMaterial({ color: game.player_set[id].color })
-    players[id] = new THREE.Mesh(g, m)
-    players[id].position.copy(game.player_set[id].pos)
-    if (scene != undefined) scene.add(players[id])
+  function scene_add_mesh(new_player) {
+    var geometry = new THREE.CylinderGeometry(2.6, 3, 2.2, 32, 32, false)
+    var material = new THREE.MeshLambertMaterial({ color: new_player.color })
+    players[new_player.uuid] = new THREE.Mesh(geometry, material)
+    players[new_player.uuid].position.copy(new_player.pos)
+    if (scene != undefined) scene.add(players[new_player.uuid])
   }
 
   function scene_remove_mesh(id) {
@@ -173,10 +164,10 @@
     game = new Game({ el: context })   // game instance.
 
     // Register event listeners.
-    game.on('init',   function() { scene_init(game) })
+    game.on('init',   function() { scene_init() })
     game.on('update', function() { scene_update(game) })
     game.on('render', function() { scene_render() })
-    game.on('add_mesh',    function(id) { scene_add_mesh(id, game) })
-    game.on('remove_mesh', function(id) { scene_remove_mesh(id) })
+    game.on('add_mesh',    function(player) { scene_add_mesh(player) })
+    game.on('remove_mesh', function(uuid) { scene_remove_mesh(uuid) })
   }
 

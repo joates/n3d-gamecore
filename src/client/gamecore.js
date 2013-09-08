@@ -581,6 +581,7 @@
     // player must exist so that we can apply the update.
     this.playercount++
     this.player_set[id] = new Player(this)
+    this.player_set[id].uuid = id
     this.player_set[id].cur_state = pos
 
     // need to override these values obtained from server.
@@ -594,7 +595,7 @@
     }
 
     // add player mesh into 3d scene.
-    this.emit('add_mesh', id, this)
+    this.emit('add_mesh', this.player_set[id])
     console.log('Player joined: ' + this.playercount + ' total')
   }
 
