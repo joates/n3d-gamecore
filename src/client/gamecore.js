@@ -249,7 +249,7 @@
     // TODO: collisions not implemented yet !
   }
 
-  game_core.prototype.scene_get_inputs = function() {
+  game_core.prototype.client_get_inputs = function() {
 
     // process controller coordinates
     cX = this.controller.deltaX() * 0.016
@@ -379,7 +379,7 @@
     // Values are transmitted to the server and also
     // stored locally and get processed on next physics tick.
 
-    var input_coords = this.scene_get_inputs()
+    var input_coords = this.client_get_inputs()
     if (input_coords) this.client_handle_input(input_coords)
 
     // Set actual player positions from the server update.
