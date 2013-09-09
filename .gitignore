@@ -16,3 +16,5 @@ node_modules
 three.js
 *.min.js
 public/bundle.js
+src/client/plugins.js
+

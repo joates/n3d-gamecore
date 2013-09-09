@@ -11,70 +11,12 @@
    */
 
   var EventEmitter = require('events').EventEmitter
+    , Controller = require('n3d-controller')
     , domready = require('domready')
     , util   = require('util')
     , io     = require('socket.io-browserify')
-    , Player = require('./Player.js')
+    , Player = require('../shared/Player.js')
     , golden_ratio = 1.6180339887
-
-  require('n3d-controller')
-
-  function createGame(opts) {
-    var opts = opts || {}
-      , game = new game_core()
-
-    game.create_physics_simulation()
-    game.create_timer()
-    game.client_create_configuration()
-
-    //Connect to the socket.io server!
-    game.client_connect_to_server()
-    game.client_create_ping_timer()
-
-    setTimeout(function() { domready(function() {
-
-        // Make this only if requested
-        if (String(window.location).indexOf('debug') != -1) {
-          game.client_create_debug_gui()
-        }
-
-        // 2D viewport. (i.e. map)
-        game.viewport = document.getElementById('viewport')
-    		game.viewport.width  = window.innerWidth * 0.25 - 20
-    		game.viewport.height = game.viewport.width / golden_ratio
-        game.ctx = game.viewport.getContext('2d')
-        game.ctx.font = '11px "Helvetica"'
-
-        if (opts.el) {
-          game.scene = opts.el
-        } else {
-          // create a default rendering context.
-          var canvas = document.createElement("canvas")
-          canvas.setAttribute('width',  window.innerWidth)
-          canvas.setAttribute('height', window.innerHeight)
-          document.body.style.background = '#101010'
-
-          // 3D scene container.
-          game.scene = document.getElementById('container')
-          game.scene.appendChild(canvas)
-        }
-
-        // touch controller.
-        game.controller = new Controller({
-          container: game.scene,
-          mouseSupport: ('createTouch' in document ? false : true),
-          strokeStyle: '#FFFF00'
-        })
-
-        game.emit('init')
-
-        // Start the game loop.
-        game.update(new Date().getTime())
-
-    })}, 0)
-
-    return game
-  }
 
   function game_core() {
     EventEmitter.call(this)
@@ -93,8 +35,65 @@
   }
 
   util.inherits(game_core, EventEmitter)
-  require('./common.js')(game_core)
-  module.exports = createGame
+  require('../shared/common.js')(game_core)
+  module.exports = game_core
+
+  game_core.prototype.start = function(opts) {
+    var self  = this
+    this.opts = opts || {}
+
+    this.create_physics_simulation()
+    this.create_timer()
+    this.client_create_configuration()
+
+    //Connect to the socket.io server!
+    this.client_connect_to_server()
+    this.client_create_ping_timer()
+
+    setTimeout(function() { domready(function() {
+
+        // Make this only if requested
+        if (String(window.location).indexOf('debug') != -1) {
+          self.client_create_debug_gui()
+        }
+
+        // TODO: this should be handled by the plugin.
+
+        // 2D viewport. (i.e. map)
+        self.viewport = document.getElementById('viewport')
+        self.viewport.width  = window.innerWidth * 0.25 - 20
+        self.viewport.height = self.viewport.width / golden_ratio
+        self.ctx = self.viewport.getContext('2d')
+        self.ctx.font = '11px "Helvetica"'
+
+        if (self.opts.renderTarget) {
+          self.scene = self.opts.renderTarget
+        } else {
+          // create a default rendering context.
+          var canvas = document.createElement("canvas")
+          canvas.setAttribute('width',  window.innerWidth)
+          canvas.setAttribute('height', window.innerHeight)
+          document.body.style.background = '#101010'
+
+          // 3D scene container.
+          self.scene = document.getElementById('container')
+          self.scene.appendChild(canvas)
+        }
+
+        // touch controller.
+        self.controller = new Controller({
+          container: self.scene,
+          mouseSupport: ('createTouch' in document ? false : true),
+          strokeStyle: '#FFFF00'
+        })
+
+        self.emit('init')
+
+        // Now actually start the game loop running.
+        self.update(new Date().getTime())
+
+    })}, 0)
+  }
 
   game_core.prototype.client_create_configuration = function() {
     this.show_2D = false

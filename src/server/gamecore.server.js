@@ -1,13 +1,6 @@
 
-  // gamecore_server.js
+  // gamecore.server.js
   // by joates (Aug-2013)
-
-  /**
-   *  Copyright (c) 2013 Asad Memon
-   *  Forked and updated.
-   *
-   *  MIT Licensed.
-   */
 
   /**
    *  Copyright (c) 2012 Sven "FuzzYspo0N" Bergström
@@ -57,7 +50,7 @@
 
 
   // load the shared player class
-  var game_player = require('../client/Player.js')
+  var game_player = require('../shared/Player.js')
 
   //  The game_core class
 
@@ -100,7 +93,7 @@
 
   //
 
-      require('../client/common.js')(game_core)
+      require('../shared/common.js')(game_core)
       module.exports = game_core
 
   //
