@@ -12,9 +12,9 @@ This is **not** a fully functional game, it is intended to be a scalable realtim
 
 
 #### Change history
-* _Aug.2012_  Original Source by [Sven Bergström](https://github.com/underscorediscovery)
-* _Apr.2013_  Forked and updated by [Asad Memon](https://github.com/asadlionpk)
 * _Aug.2013_  Forked and extended to support 3D (as well as 2D) by [joates](https://github.com/joates)
+* _Apr.2013_  Forked and updated by [Asad Memon](https://github.com/asadlionpk)
+* _Aug.2012_  Original Source by [Sven Bergström](https://github.com/underscorediscovery)
 
 
 ## Realtime Multiplayer In HTML5
@@ -23,27 +23,68 @@ Read the original article here (2D only):
 http://buildnewgames.com/real-time-multiplayer/
 
 #### Getting started
-* Grab the most recent release bundle from [here](https://github.com/joates/n3d-gamecore/releases)
-* extract all the files (from the zip/tarball)
-* _rename_ `n3d-gamecore-<release_name>` to just `n3d-gamecore`
-* type `cd n3d-gamecore/public/`
+
+##### using node / npm ( _easiest method_ )
+* `npm install n3d-gamecore`
+* `cd n3d-gamecore`
+* `npm install` ( _to fetch dependencies_ )
+* ( **you will still need to make the Three.js library files available at the paths expected by** `public/index.html`)
+* `npm start` ( _this builds the bundle.js file needed by clients & starts the game server running_ )
+* visit `http://localhost:8000` with your browser
+  * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
+
+##### download from github / git clone
+* there are different ways to get files from github or by using git..
+  * grab the most recent release bundle from [here](https://github.com/joates/n3d-gamecore/releases)
+    extract all the files (from the zip/tarball)
+    _rename_ `n3d-gamecore-<release_name>` to just `n3d-gamecore`
+  * the terminal command `git clone git@github.com:joates/n3d-gamecore.git` will download the files but
+    you **also** need to type `cd n3d-gamecore` and then `git checkout dev` to switch branches.
 * Grab the latest three.js release from [here](https://github.com/mrdoob/three.js/releases)
-* extract all the files (from three.js zip/tarball)
-* check that the links in `n3d-gamecore/public/index.html` can access `three.min.js`
-  (& `dat.gui.min.js` is optional)
+  extract all the files (from three.js zip/tarball)
+  check that the links in `n3d-gamecore/public/index.html` can access `three.min.js` (& `dat.gui.min.js` is optional)
   * you will probably just need to _rename_ the `three.js-r??` folder to `three.js`
 * type `cd ..` to get back to the `n3d-gamecore` root folder
-* run `npm install` (to download the node module dependencies)
-* run `npm start` (to start the game server running)
+* run `npm install` ( _to fetch dependencies_ )
+* run `npm start` ( _this builds the bundle.js file needed by clients & starts the game server running_ )
 * Visit `http://localhost:8000` with your browser
   * use `http://localhost:8000/?debug` as the URL if you want to enable the debug interface.
 
-
 NOTE: the movement controller is designed for a device with a touchscreen,
-if you have a normal (non-touch) screen you can either
+but if you have a normal (non-touch) screen it will fallback to normal mouse control ( _just click and drag to move_ ).
 
-1. enable the `Emulate touch events` setting in the browser ( _and use the mouse_ ) or
-2. change `mouseSupport: false` to `true` in `public/js/main.js` ( _and use the mouse_ )
+#### Plugin API (example)
+
+```javascript
+  var PluginExample_Client = (function() {
+
+    function PluginExample_Client() {
+      /* code which runs on the clients here */
+    }
+
+    return PluginExample_Client
+
+  })()
+
+  var PluginExample_Server = (function() {
+
+    function PluginExample_Server() {
+      /* server plugin code here */
+    }
+
+    return PluginExample_Server
+
+  })()
+
+  module.exports = {
+    client:  PluginExample_Client,
+    server:  PluginExample_Server,
+    options: {},
+    enabled: true,
+    weight:  0
+  }
+```
 
 
 MIT Licensed.
+
