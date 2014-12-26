@@ -20,8 +20,8 @@
   //  requestAnimationFrame polyfill by Erik Möller
   //  fixes from Paul Irish and Tino Zijdel
 
-  var frame_time = 60 / 1000  // run the local game at 16ms/ 60hz
-  if ('undefined' != typeof(global)) frame_time = 45  //on server we run at 45ms, 22hz
+  var frame_time = 1 / 60  // run the local game at 16.6ms/ 60hz
+  if ('undefined' != typeof(global)) frame_time = 1 / 45  //on the server we run at 22ms, 45hz
 
   ;(function() {
 
